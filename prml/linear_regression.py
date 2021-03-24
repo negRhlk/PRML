@@ -2,17 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import warnings 
 
+from prml.utils import gauss
 
-# Gauss 
-def gauss(x,mu,s):
-    #:params x: 1-D array data 
-    #:prams mu,s: \mu and \sigma 
-    #:return: \phi(x) 
-    phi = np.exp(-(x.reshape(-1,1) - mu)/(2*s**2))
-    phi = np.concatenate(([1],phi.ravel()))
-    return phi
-
-
+# Simple Linear Regression 
 class LinearRegression():
     def __init__(self,mu = None,s = None):
         self.weight = None
@@ -37,6 +29,7 @@ class LinearRegression():
         return np.dot(design_mat,self.weight)
 
 
+# Ridge Regression (regularization term)
 class Ridge():
     def __init__(self,lamda=1e-2,mu = None,s = None):
         self.weight = None
@@ -48,8 +41,6 @@ class Ridge():
     def fit(self,X,y):
         #:params X: 2-D array (N_samples,N_dims)
         #:params y: 2-D array (N_samples,N_targets)  
-        N = X.shape[0] 
-        K = y.shape[1]
         M = X.shape[1]*self.mu.shape[0] + 1
         design_mat = np.vstack([self.phi(x) for x in X])
         self.weight = np.linalg.inv(self.lamda*np.eye(M) + design_mat.T@design_mat)@design_mat.T@y 
@@ -59,7 +50,7 @@ class Ridge():
         design_mat = np.vstack([self.phi(x) for x in X])
         return np.dot(design_mat,self.weight)
 
-
+# basysian ridge regression
 class BayesianLinearRegression():
     def __init__(self,alpha = 1e-1,beta = 1e-1,mu = None,s = None):
         self.weight = None
