@@ -109,9 +109,12 @@ class PolynomialMat(DesignMat):
     Attributes:
         deg (int) : max degree of polynomial features
     """
-    def __init__(self,deg = 5):
+    def __init__(self,deg = None):
         super(PolynomialMat,self).__init__() 
-        self.deg = deg 
+        if deg is None:
+            self.deg = 5
+        else:
+            self.deg = deg 
     
     def _basis_function(self,x):
         """Basis function 
