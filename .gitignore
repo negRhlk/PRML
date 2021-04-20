@@ -1,4 +1,7 @@
 .DS_Store 
 /.ipynb_checkpoints/*
+
 /prml/__pycache__/*
+/prml/utils/__pycache__/*
+
 test*.py
