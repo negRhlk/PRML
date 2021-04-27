@@ -6,13 +6,16 @@ chapter4
     ficher's linear discriminant (for multiple-class)
     perceptron
     generative classifier 
-
+    logistic regression (for 2-class)
+    logistic regression (for multi-class)
+    bayesian logistic regression (for 2-class)
 """
 
 import numpy as np 
 from math import log 
-from prml.utils.util import softmax
+from prml.utils.util import sigmoid,softmax,binary_cross_entropy,cross_entropy,kappa
 from prml.utils.encoder import OnehotToLabel,LabelToOnehot
+from prml.design_mat import GaussMat,SigmoidMat,PolynomialMat
 
 class Classifier(): 
     """
@@ -41,6 +44,7 @@ class Classifier():
             return X
         else:
             return self.transformer.inverse(X) 
+
 
 class LinearClassifier(Classifier):
     """Linear Classifier 
@@ -77,7 +81,10 @@ class LinearClassifier(Classifier):
         X = np.hstack((one,X))
         y = X@self.weight
         label = y.argmax(axis = 1)
-        return self._inverse_transform(label) 
+        onehot = np.zeros_like(y)
+        for k in range(y.shape[1]):
+            onehot[label == k,k] = 1 
+        return self._inverse_transform(onehot) 
 
 
 class Fisher1D(Classifier):
@@ -301,7 +308,7 @@ class GenerativeClassifier(Classifier):
         """
         
         logit = X@self.weight + self.b 
-        prob = softmax(logit)
+        prob = sigmoid(logit) 
         y = np.zeros(X.shape[0])
         y[prob > 0.5] = 1
         return self._inverse_transform(y) 
@@ -327,3 +334,255 @@ class GenerativeClassifier(Classifier):
         X[x < self.pi,:] = np.random.multivariate_normal(self.mu1,self.sigma,class1)
         
         return X,y
+
+
+class _logistic_regression_base(Classifier):
+    def __init__(self,max_iter,threshold,basis_function="gauss",mu=None,s=None,deg=None):
+        """
+        Args:
+            basis_funtion (str) : "gauss" or "sigmoid" or "polynomial" 
+            mu (1-D array) : mean parameter 
+            s (1-D array) : standard deviation parameter 
+            deg (int) : max degree of polynomial features
+        """
+        super(_logistic_regression_base,self).__init__() 
+        if basis_function == "gauss":
+            self.make_design_mat = GaussMat(mu = mu,s = s)
+        elif basis_function == "sigmoid":
+            self.make_design_mat = SigmoidMat(mu = mu,s = s)
+        elif basis_function == "polynomial":
+            self.make_design_mat = PolynomialMat(deg = deg) 
+
+        self.max_iter = max_iter 
+        self.threshold = threshold
+
+
+class LogisticRegression(_logistic_regression_base):
+    """Logistic Regression for 2-class 
+
+    use IRLS when optimiztin parameters 
+
+    Attributes:
+        weight (array) : parameters
+        max_iter (int) : max iteration for parameter optimization
+        threshold (float) : threshold for optimizint parameters 
+        basis_function (str) : "gauss" or "sigmoid" or "polynomial" 
+        mu (1-D array) : mean parameter 
+        s (1-D array) : standard deviation parameter 
+        deg (int) : max degree of polynomial features
+    """
+    def __init__(self,max_iter=30,threshold=1e-2,basis_function="gauss",mu=None,s=None,deg=None):
+        """
+        Args:
+            max_iter (int) : max iteration for parameter optimization
+            threshold (float) : threshold for optimizint parameters 
+            basis_function (str) : "gauss" or "sigmoid" or "polynomial" 
+            mu (1-D array) : mean parameter 
+            s (1-D array) : standard deviation parameter 
+            deg (int) : max degree of polynomial features
+        """
+        super(LogisticRegression,self).__init__(max_iter,threshold,basis_function,mu,s,deg)
+        
+    def fit(self,X,y):
+        """fit 
+
+        Args:
+            X (2-D array) : data, shape = (N_samples,N_dims)
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data. 
+        
+        Note:
+            optimizing parameters in IRLS
+        """
+        target = self._onehot_to_label(y)
+        target = target.reshape(-1,1)
+        
+        design_mat = self.make_design_mat(X) 
+        self.weight = np.random.randn(design_mat.shape[1]).reshape(-1,1)
+        for _ in range(self.max_iter):
+            y = sigmoid(design_mat@self.weight)
+            if binary_cross_entropy(target,y) < self.threshold:
+                break 
+            R = y*(1.0 - y)
+            if np.any(abs(R)<1e-20): # prevent overflow and error
+                R += 1e-10
+            z = design_mat@self.weight - (y - target)/R 
+            self.weight = np.linalg.pinv(design_mat.T@(R*design_mat))@design_mat.T@(R*z)
+        
+    def predict(self,X,return_prob=False):
+        """predict 
+
+        Args:
+            X (2-D arrray) : shape = (N_samples,N_dims)
+            return_prob (bool) : if True, return probability 
+        Returns:
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
+            or if return_prob == True
+
+            y (1-D array) :  always return probability of belonging to class1 in each record 
+        """
+        
+        design_mat = self.make_design_mat(X) 
+        logit = (design_mat@self.weight).ravel() 
+        if return_prob:
+            return  sigmoid(logit)
+        else:
+            y = np.zeros(X.shape[0])
+            y[logit >= 0] = 1
+            return self._inverse_transform(y)
+
+
+class MultiClassLogisticRegression(_logistic_regression_base):
+    """Logistic Regression for multi-class
+
+    use gradient descent method for parameter optimization 
+
+    Attributes:
+        max_iter (int) : max iteration for parameter optimization
+        threshold (float) : threshold for optimizint parameters 
+        learning_rate (float) : learning_rate
+        basis_function (str) : "gauss" or "sigmoid" or "polynomial" 
+        mu (1-D array) : mean parameter 
+        s (1-D array) : standard deviation parameter 
+        deg (int) : max degree of polynomial features
+    """
+    def __init__(self,max_iter=30,threshold=1e-2,learning_rate=1e-2,basis_function="gauss",mu=None,s=None,deg=None):
+        """
+        Args:
+            max_iter (int) : max iteration for parameter optimization
+            threshold (float) : threshold for optimizint parameters 
+            learning_rate (float) : learning_rate
+            basis_function (str) : "gauss" or "sigmoid" or "polynomial" 
+            mu (1-D array) : mean parameter 
+            s (1-D array) : standard deviation parameter 
+            deg (int) : max degree of polynomial features
+        """
+        super(MultiClassLogisticRegression,self).__init__(max_iter,threshold,basis_function,mu,s,deg)
+        self.learning_rate = learning_rate
+        
+    def fit(self,X,y): 
+        """fit 
+
+        Args:
+            X (2-D array) : data, shape = (N_samples,N_dims)
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. 
+        
+        Note:
+            optimizing parameters in gradient descent method 
+        """
+        y = self._label_to_onehot(y) 
+        design_mat = self.make_design_mat(X) 
+        self.weight = np.random.randn(design_mat.shape[1],y.shape[1])
+        
+        for _ in range(self.max_iter):
+            probability = softmax(design_mat@self.weight)
+            loss = cross_entropy(y,probability)
+            if loss < self.threshold:
+                break 
+            self.weight -= self.learning_rate*design_mat.T@(probability - y)   
+        
+    def predict(self,X,return_prob=False):
+        """predict 
+
+        Args:
+            X (2-D arrray) : shape = (N_samples,N_dims)
+            return_prob (bool) : if True, return probability 
+        Returns:
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
+            or if return_prob == True
+
+            y (2-D array) :  always return probability of belonging to each class in each record 
+        """
+        
+        design_mat = self.make_design_mat(X) 
+        logit = design_mat@self.weight 
+        if return_prob:
+            return softmax(logit)
+        else:
+            y = softmax(logit)
+            return self._inverse_transform(y) 
+
+
+class BayesianLogisticRegression(_logistic_regression_base):
+    """Bayesian logistic regression for 2-class 
+
+    Attributes:
+        weight (array) : parameter 
+        S (array) : variance of posterior distribution 
+        alpha (float) : precision parameter of prior distribution 
+        max_iter (int) : max iteration for parameter optimization
+        threshold (float) : threshold for optimizint parameters 
+        learning_rate (float) : learning rate 
+        basis_function (str) : "gauss" or "sigmoid" or "polynomial" 
+        mu (1-D array) : mean parameter 
+        s (1-D array) : standard deviation parameter 
+        deg (int) : max degree of polynomial features
+    """
+    def __init__(self,alpha=1e-2,max_iter=30,threshold=1e-2,learning_rate=1e-2,basis_function="gauss",mu=None,s=None,deg=None):
+        """
+        Args:
+            alpha (float) : precision parameter of prior distribution 
+            max_iter (int) : max iteration for parameter optimization
+            threshold (float) : threshold for optimizint parameters 
+            learning_rate (float) : learning rate 
+            basis_function (str) : "gauss" or "sigmoid" or "polynomial" 
+            mu (1-D array) : mean parameter 
+            s (1-D array) : standard deviation parameter 
+            deg (int) : max degree of polynomial features
+        """
+        super(BayesianLogisticRegression,self).__init__(max_iter,threshold,basis_function,mu,s,deg)
+        self.alpha = alpha 
+        self.learning_rate = learning_rate
+        self.S = None
+    
+    def fit(self,X,y):
+        """fit 
+
+        Args:
+            X (2-D array) : data, shape = (N_samples,N_dims)
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data. 
+        
+        Note:
+            optimizing parameters in gradient descent method 
+        """
+        y = self._onehot_to_label(y) 
+        y = y.reshape(-1,1)
+            
+        design_mat = self.make_design_mat(X) 
+        self.weight = np.random.randn(design_mat.shape[1]).reshape(-1,1) 
+        
+        for _ in range(self.max_iter):
+            probability = sigmoid(design_mat@self.weight)
+            loss = binary_cross_entropy(y,probability)
+            if loss < self.threshold:
+                break
+            self.weight -= self.learning_rate*(self.alpha*self.weight + design_mat.T@(probability - y))
+        
+        R = (probability*(1.0 - probability)).ravel()  
+        self.S = 1/self.alpha*np.eye(self.weight.shape[1]) + (R*design_mat.T)@design_mat             
+    
+    def predict(self,X,return_prob=False):
+        """predict 
+
+        Args:
+            X (2-D arrray) : shape = (N_samples,N_dims)
+            return_prob (bool) : if True, return probability 
+        Returns:
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
+            or if return_prob == True
+
+            y (1-D array) :  always return probability of belonging to class1 in each record 
+        """
+        
+        design_mat = self.make_design_mat(X)
+        logit = (design_mat@self.weight).ravel()
+        if return_prob:
+            sigma = np.diag(design_mat@self.S@design_mat.T) 
+            prob = sigmoid(kappa(sigma)*logit)
+            return prob 
+        else:
+            y = np.zeros(X.shape[0])
+            y[logit >= 0] = 1 
+            return self._inverse_transform(y) 
