@@ -28,7 +28,7 @@ class RegressionDataGenerator():
         """
         m = (lower + upper)/2 
         s = (upper - lower)/2 
-        X = np.random.rand(n)*s + m
+        X = np.random.randn(n)*s + m
         y = self.f(X) + np.random.randn(n)*std 
         return X.reshape(-1,1),y.reshape(-1,1)
 
