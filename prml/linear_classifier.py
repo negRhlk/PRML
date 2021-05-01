@@ -46,7 +46,7 @@ class Classifier():
             return self.transformer.inverse(X) 
 
 
-class LinearClassifier(Classifier):
+class LinearClassifier(Classifier): 
     """Linear Classifier 
 
     solve classification problem by minimizing least-squared-error. 
