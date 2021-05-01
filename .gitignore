@@ -3,5 +3,6 @@
 
 /prml/__pycache__/*
 /prml/utils/__pycache__/*
+/prml/nn/__pycache__/*
 
 test*.py
