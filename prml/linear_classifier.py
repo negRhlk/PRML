@@ -497,11 +497,15 @@ class MultiClassLogisticRegression(_logistic_regression_base):
         
         design_mat = self.make_design_mat(X) 
         logit = design_mat@self.weight 
+        prob = softmax(logit)
         if return_prob:
-            return softmax(logit)
+            return prob 
         else:
-            y = softmax(logit)
-            return self._inverse_transform(y) 
+            onehot = np.zeros_like(prob) 
+            clas = prob.argmax(axis = 1)
+            for k in range(onehot.shape[1]):
+                onehot[clas == k,k] = 1
+            return self._inverse_transform(onehot) 
 
 
 class BayesianLogisticRegression(_logistic_regression_base):
