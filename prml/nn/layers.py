@@ -7,11 +7,15 @@
         Relu
     
     Loss Layers:
-        Rmse 
+        MeanSquaerdErroor 
+        SigmoidCrossEntropy 
+        SoftmaxCrossEntropy 
 """
 
 import numpy as np 
 from abc import ABCMeta,abstractclassmethod
+
+from prml.utils.util import sigmoid,softmax,binary_cross_entropy,cross_entropy
 
 
 class _Layer(metaclass=ABCMeta):
@@ -142,6 +146,8 @@ class Relu(_ActivationLayer):
     """
     def __init__(self):
         super(Relu,self).__init__() 
+        self.X = None 
+
     def forward(self,X):
         """forward
 
@@ -170,18 +176,19 @@ class _LossLayer(metaclass=ABCMeta):
     def __init__(self):
         pass 
     @abstractclassmethod
-    def forward(self,X):
+    def forward(self,predict,target):
         pass 
     @abstractclassmethod
     def backward(self,loss):
         pass 
 
-class Rmse(_LossLayer):
-    """Rmse 
+class MeanSquaredError(_LossLayer):
+    """MeanSquaredError
 
-    loss function used in regression problems 
+    loss layer  used in regression problems 
     """
     def __init__(self):
+        super(MeanSquaredError,self).__init__()
         self.predict = None 
         self.target = None
     def forward(self,predict,target):
@@ -190,6 +197,9 @@ class Rmse(_LossLayer):
         Args:
             predict (array) : predict values 
             target (array) : ground truth 
+        
+        Return:
+            loss (float) : mean squared loss 
         """
         self.predict = predict
         self.target = target  
@@ -202,8 +212,82 @@ class Rmse(_LossLayer):
         Returns:
             dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
         Note:
-            loss layer is always receive 0 when backward  
+            loss layer is always receive 1 when backward  
         """
         shape = self.target.shape[0]
-        dx = loss*(self.predict - self.target)/shape
-        return dx
+        dX = loss*(self.predict - self.target)/shape
+        return dX
+
+class SigmoidCrossEntropy(_LossLayer): 
+    """sigmoid activation function and cross entropy loss 
+
+    this layer is sigmoid layer which has binary cross entropy loss 
+    """
+    def __init__(self): 
+        super(SigmoidCrossEntropy,self).__init__() 
+        self.predict = None 
+        self.target = None 
+    
+    def forward(self,X,target): 
+        """forward
+
+        Args:
+            X (2-D array) : data,shape is (N_samples,2)
+            target (2-D array) : data, shape is (N_samples,2) 
+        
+        Returns:
+            loss (float) : cross entropy of sigmoid(X) and target 
+        """
+        self.predict = softmax(X) 
+        self.target = target 
+        return binary_cross_entropy(target,self.predict) 
+    
+    def backward(self,loss): 
+        """backward 
+
+        Args:
+            loss (2-D array) : 1 
+        Returns:
+            dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+        Note:
+            loss layer is always receive 1 when backward  
+        """
+        shape = self.target.shape[0] 
+        return loss*(self.predict - self.target)/shape 
+
+class SoftmaxCrossEntropy(_LossLayer): 
+    """Softmax Cross Entropy 
+
+    this layer is softmax layer which has cross entropy loss 
+    """
+
+    def __init__(self): 
+        super(SoftmaxCrossEntropy,self).__init__()
+        self.predict = None 
+        self.target = None 
+    
+    def forward(self,X,target): 
+        """forward 
+
+        Args:
+            X (2-D array) : data, shape = (N_samples,N_class)
+            target (2-D array) : ground truth, shape = (N_samples,N_class)
+        Return:
+            loss (float) : cross entropy loss 
+        """
+        self.predict = softmax(X)  
+        self.target = target 
+        return cross_entropy(target,self.predict) 
+    
+    def backward(self,loss):
+        """backward 
+
+        Args:
+            loss (2-D array) : 1 
+        Returns:
+            dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+        Note:
+            loss layer is always receive 1 when backward  
+        """
+        shape = self.target.shape[0]
+        return loss*(self.predict - self.target)/shape 
