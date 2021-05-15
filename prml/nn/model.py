@@ -3,6 +3,11 @@
     _Model
     Regressor
     Classifier
+
+Todo:
+    caluculate hessian 
+    baysesian nn 
+    implementation of optimzer
 """
 
 import numpy as np 
@@ -119,10 +124,10 @@ class _Model():
             X = layer.forward(X)
         return X
 
-class Regressor(_Model):
+class RegressorNN(_Model):
     pass 
 
-class Classifier(_Model):
+class ClassifierNN(_Model):
     def __init__(self,learning_rate=1e-1,max_iter=10000,threshold=1e-6,batch_size=100,random_state=0):
         """Classifier
 
@@ -133,7 +138,7 @@ class Classifier(_Model):
             batch_size (int) : number of batch size 
             random_state (int) : random state 
         """
-        super(Classifier,self).__init__(learning_rate,max_iter,threshold,batch_size,random_state)
+        super(ClassifierNN,self).__init__(learning_rate,max_iter,threshold,batch_size,random_state)
         self.transformer = None 
     
     def _label_to_onehot(self,y): 
@@ -155,10 +160,10 @@ class Classifier(_Model):
             X (2-D array) : data, shape = (N_samples,N_dims)
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded.
             loss (loss-layer) : layer which inherits _LossLayer 
-            optimizer (str) : "GradientDescent" or "SGC" 
+            optimizer (str) : "GradientDescent" or "SGD" 
         """
         y = self._label_to_onehot(y) 
-        return super(Classifier,self).fit(X,y,loss,optimizer)
+        return super(ClassifierNN,self).fit(X,y,loss,optimizer)
 
     def predict(self,X,return_prob=False):
         """predict 
@@ -170,7 +175,7 @@ class Classifier(_Model):
         Returns:
             softmax (2-D array) : classification 
         """
-        feature = super(Classifier,self).predict(X)
+        feature = super(ClassifierNN,self).predict(X)
         prob = softmax(feature)
         if return_prob:
             return prob 
