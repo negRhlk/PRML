@@ -87,7 +87,7 @@ class _Model():
             X (2-D array) : data, shape = (N_samples,N_dims)
             y (2-D array) : data, shape = (N_samples,N_class or N_target)
             loss (loss-layer) : layer which inherits _LossLayer 
-            optimizer (str) : "GradientDescent" or "SGC" 
+            optimizer (str) : "GradientDescent" or "SGD" 
         """
         self.loss_layer = loss
         N = X.shape[0]
