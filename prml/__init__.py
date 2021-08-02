@@ -5,3 +5,5 @@ from prml import probability_distribution
 from prml import design_mat
 from prml import linear_regression
 from prml import linear_classifier
+from prml import kernel_func
+from prml import kernel_method

@@ -1,6 +1,8 @@
 """Plot
-"""
 
+    plot_regressionr1D 
+    plot_classifier
+"""
 
 import numpy as np 
 import matplotlib.pyplot as plt 
@@ -8,6 +10,35 @@ from matplotlib.colors import ListedColormap
 from prml.utils.encoder import OnehotToLabel 
 
 color = ["red","blue","lightgreen","yellow","orange","purple","pink"] 
+cmaps = [[0.122, 0.467, 0.706],"orange","green"]
+
+def plot_regression1D(X_tr,y_tr,regressor,title,f,lower = 0,upper = 2*np.pi):
+    """plot regressor 
+
+    Args:
+        X_tr (1-D array) : training data,explanatory variable 
+        y_tr (1-D array) : training data,target variable 
+        regressor (object) : trained regressor model which must have "predict" method 
+        title (string) : title of the plot 
+        f (function) : regression function 
+        lower,upper (float) : lower <= x <= upper
+    """
+    X = np.linspace(lower,upper,100).reshape(-1,1)
+    y_pred = regressor.predict(X) 
+    y_true = f(X)
+    
+    rmse = np.mean((y_true - y_pred)**2)**0.5
+    print(f"RMSE : {rmse}")
+    
+    fig,ax = plt.subplots(1,1,figsize = (10,7))
+    ax.plot(X,y_pred,label="Predict",color=cmaps[0])
+    ax.plot(X,y_true,label="Ground Truth",color=cmaps[1])
+    ax.scatter(X_tr,y_tr,label="Training Data",color=cmaps[2])
+    ax.set_title(title)
+    
+    plt.legend()
+    plt.show()
+
 
 def plot_classifier(X_tr,y_tr,classifier,title=""):
     """plot classifier 

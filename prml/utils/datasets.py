@@ -25,10 +25,8 @@ class RegressionDataGenerator():
         Returns:
             X (2-D array) : explanatory variable,shape = (N_samples,1)
             y (2-D array) : target variable, shape = (N_samples,1) 
-        """
-        m = (lower + upper)/2 
-        s = (upper - lower)/2 
-        X = np.random.randn(n)*s + m
+        """ 
+        X = np.random.rand(n)*(lower - upper) + upper
         y = self.f(X) + np.random.randn(n)*std 
         return X.reshape(-1,1),y.reshape(-1,1)
 
