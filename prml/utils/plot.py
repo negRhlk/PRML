@@ -39,6 +39,38 @@ def plot_regression1D(X_tr,y_tr,regressor,title,f,lower = 0,upper = 2*np.pi):
     plt.legend()
     plt.show()
 
+def plot_regression1D_with_std(X_tr,y_tr,regressor,title,f,lower = 0,upper = 2*np.pi):
+    """plot regressor 
+
+    Args:
+        X_tr (1-D array) : training data,explanatory variable 
+        y_tr (1-D array) : training data,target variable 
+        regressor (object) : trained regressor model which must have "predict" method which should have 'return_std = True' as parameter 
+        title (string) : title of the plot 
+        f (function) : regression function 
+        lower,upper (float) : lower <= x <= upper
+    """
+    X = np.linspace(lower,upper,100).reshape(-1,1)
+    y_pred,y_std = regressor.predict(X,return_std=True)
+    y_true = f(X)
+    
+    rmse = np.mean((y_pred - y_true)**2)**0.5
+    print(f"RMSE : {rmse}")
+    
+    fig,ax = plt.subplots(1,1,figsize = (10,7))
+    ax.plot(X,y_pred,label="Predict",color=cmaps[0])
+    
+    y_pred_upper = y_pred + y_std
+    y_pred_lower = y_pred - y_std 
+    ax.fill_between(X.ravel(),y_pred_lower.ravel(),y_pred_upper.ravel(),alpha=0.3,color=cmaps[0])
+    
+    ax.plot(X,y_true,label="Ground Truth",color=cmaps[1])
+    ax.scatter(X_tr,y_tr,label="Training Data",color=cmaps[2])
+    ax.set_title(title)
+    
+    plt.legend()
+    plt.show()
+
 
 def plot_classifier(X_tr,y_tr,classifier,title=""):
     """plot classifier 
