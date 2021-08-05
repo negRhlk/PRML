@@ -222,8 +222,8 @@ class GaussianProcessClassifier(BaseKernelMachine,Classifier):
             h (function) : for "RBF" kernel 
             theta (float) : for "Exponential" kernel
         """
-        super(GaussianProcessClassifier).__init__(kernel=kernel,sigma=sigma,a=a,b=b,h=h,theta=theta)
-        Classifier.__init__() # this part should be fixed 
+        super(GaussianProcessClassifier,self).__init__(kernel=kernel,sigma=sigma,a=a,b=b,h=h,theta=theta)
+        Classifier.__init__(self) # this part should be fixed 
         self.alpha = alpha 
         self.gamma = gamma 
         self.max_iter = max_iter 
@@ -280,9 +280,9 @@ class GaussianProcessClassifier(BaseKernelMachine,Classifier):
         sig = sig.ravel()
 
         if return_prob:
-            c = np.array([self.kernel_func(X[i],X[i]) for i in range(X.shape[0])]).reshape(-1,1) + self.gamma
-            W = np.diag(1/(sig*(1 - sig)))  
-            sigma = c - np.diag(gram_mat.T@np.linalg.inv(1/W + self.C)@gram_mat).reshape(-1,1)
+            c = np.array([self.kernel_func(X[i],X[i]) for i in range(X.shape[0])]) + self.gamma
+            W = np.diag(1/(sig*(1 - sig))) 
+            sigma = c - np.diag(gram_mat.T@np.linalg.inv(W + self.C)@gram_mat)
             prob = sigmoid(kappa(sigma)*logit) 
             return prob  
         else: 
