@@ -58,12 +58,8 @@ class ClassificationDataGenerator2():
             y (encoding = "onehot") (2-D array) : target variable,shape = (N_samples,2)
             y (encoding = "target") (1-D array) : target variable,shape = (N_samples) 
         """ 
-        mx = (x_upper + x_lower)/2 
-        sx = (x_upper - x_lower)/2 
-        X1 = np.random.randn(n)*sx + mx 
-        my = (y_upper + y_lower)/2 
-        sy = (y_upper - y_lower)/2 
-        X2 = np.random.randn(n)*sy + my
+        X1 = np.random.rand(n)*(x_upper - x_lower) + x_lower
+        X2 = np.random.rand(n)*(y_upper - y_lower) + y_lower
         X = np.concatenate([X1.reshape(-1,1),X2.reshape(-1,1)],axis = 1) 
         if encoding == "onehot":
             y = np.zeros((n,2)) 
@@ -107,12 +103,8 @@ class ClassificationDataGenerator3():
             y (encoding = "onehot") (2-D array) : target variable,shape = (N_samples,3)
             y (encoding = "target") (1-D array) : target variable,shape = (N_samples) 
         """ 
-        mx = (x_upper + x_lower)/2 
-        sx = (x_upper - x_lower)/2 
-        X1 = np.random.randn(n)*sx + mx 
-        my = (y_upper + y_lower)/2 
-        sy = (y_upper - y_lower)/2 
-        X2 = np.random.randn(n)*sy + my
+        X1 = np.random.rand(n)*(x_upper - x_lower) + x_lower
+        X2 = np.random.rand(n)*(y_upper - y_lower) + y_lower
         X = np.concatenate([X1.reshape(-1,1),X2.reshape(-1,1)],axis = 1) 
         if encoding == "onehot":
             y = np.zeros((n,3)) 
