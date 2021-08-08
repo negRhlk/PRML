@@ -9,12 +9,19 @@ from prml.linear_classifier import Classifier
 from prml.kernel_method import BaseKernel, BaseKernelMachine, DualRegression
 
 
-
-  
 class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
     """SupportVectorMachineClassifier 
 
     We use SMO algotithm for solving dual problem
+
+    Attributes:
+        C (float) : if C is larger, misclassification on train data is not permitted. 
+        eps (float) : parameter for judging KKT condition is fulfilled 
+        dual_weight (array): weight 
+        b (float): bias parameter 
+        support_vector (array): index of support vector 
+        support_vector_X (array): explanatory variable of support vector 
+        support_vector_y (array): target of support vector 
 
     Reference:
         https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-98-14.pdf
@@ -22,6 +29,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
     """
     def __init__(self,C=20.0,eps=1e-3,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
         """
+
         Args: 
             C (float) : if C is larger, misclassification on train data is not permitted. 
             eps (float) : parameter for judging KKT condition is fulfilled 
@@ -30,6 +38,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             a,b (float) : for "Sigmoid" kernel
             h (function) : for "RBF" kernel 
             theta (float) : for "Exponential" kernel
+
         """
         super(SupportVectorMachineClassifier,self).__init__(kernel=kernel,sigma=sigma,a=a,b=b,h=h,theta=theta)
         Classifier.__init__(self) # this part should be fixed 
@@ -37,6 +46,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
         self.eps = eps 
         self.dual_weight = None # alpha
         self.b = None 
+        self.support_vector = None 
         self.support_vector_X = None 
         self.support_vector_y = None 
 
@@ -46,6 +56,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
         Args:
             X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
+
         """ 
         self.gram_mat = self.gram_func(X) 
         y = self._onehot_to_label(y)
@@ -75,7 +86,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
         self.support_vector_y = y[self.support_vector]
         self.dual_weight = self.dual_weight[self.support_vector] 
 
-        del self.gram_mat,self.y,self.error_cache,self.support_vector # for memory
+        del self.gram_mat,self.y,self.error_cache # for memory
     
     def _examin_example(self,i2):
         """_examin_example 
@@ -84,7 +95,8 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             i2 (int) : index of the data which will be optimized 
         
         Returns:
-            num_changed (bool) : if parameter was changed of not 
+            num_changed (int) : parameter was changed or not 
+
         """
         y2 = self.y[i2] 
         alpha2 = self.dual_weight[i2] 
@@ -94,14 +106,14 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             if len(self.support_vector) > 1:
                 i1 = np.argmax(np.abs(self.error_cache - E2)) 
                 if self._take_step(i1,i2,y2,alpha2,E2):
-                    return True 
+                    return 1  
             for i1 in self.support_vector:
                 if self._take_step(i1,i2,y2,alpha2,E2):
-                    return True 
+                    return 1  
             for i1 in range(self.y.shape[0]):
                 if self._take_step(i1,i2,y2,alpha2,E2):
-                    return True 
-        return False 
+                    return 1 
+        return 0 
     
     def _take_step(self,i1,i2,y2,alpha2,E2):
         """_take_step 
@@ -111,6 +123,10 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             y2 (int) : class of data[i2] 
             alpha2 (float) : weight which corresponds to data[i2]
             E2 (float) : error of data[i2]
+        
+        Returns:
+            updated_or_not (bool): if parameter was updated or not 
+
         """
         if i1 == i2:
             return False 
@@ -130,7 +146,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             a2 = H 
         
         if abs(a2 - alpha2) < self.eps*(a2 + alpha2 + self.eps): # change is too small
-            return 0 
+            return False  
         
         a1 = alpha1 + y1*y2*(alpha2 - a2) 
         self._update_threshold(i1,i2,alpha1,alpha2,a1,a2,y1,y2,E1,E2)
@@ -147,6 +163,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
         Args:
             y1,y2 (int): class of data[i1],data[i2] 
             alpha1,alpha2 (float): weight which corresponds to data[i1],data[i2]
+
         """
         if y1 != y2:
             diff = alpha2 - alpha1
@@ -174,6 +191,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             a1,a2 (float): updated weight which corresponds to data[i1],data[i2]
             y1,y2 (int): class of data[i1],data[i2] 
             E1,E2 (float) : error of data[i1],data[i2]
+
         """
         if 0 < a1 < self.C:
             self.b -= E1 + y1*(a1 - alpha1)*self.gram_mat[i1,i1] + y2*(a2 - alpha2)*self.gram_mat[i1,i2] 
@@ -196,6 +214,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
             or if return_prob == True
             y (1-D array) :  always return probability of belonging to class1 in each record 
+
         """
         gram_mat = np.zeros((self.support_vector_X.shape[0],X.shape[0]))
         for i in range(self.support_vector_X.shape[0]):
@@ -206,3 +225,22 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
         y[sign_y > 0] = 1 
         y[sign_y <= 0] = 0 
         return self._inverse_transform(y)
+    
+    def number_of_support_vector(self):
+        """number_of_support_vector
+
+        Returns:
+            number_of_support_vector (int) : number of support vector
+
+        """
+        return len(self.support_vector) 
+    
+    def index_of_support_vector(self):
+        """index_of_support_vector
+
+        Returns:
+            index_of_support_vector (array) : index_of_support_vector
+
+        """
+        return self.support_vector
+        
