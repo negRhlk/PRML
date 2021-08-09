@@ -1,12 +1,17 @@
 """Sparse Kernel Machines 
 
     SupportVectorMachineClassifier 
-    
+    RelevanceVectorMachineRegressor 
+    RelevanceVectorMachineClassifier 
+
+    Todo:
+        SupportVecotrMachineRegressor
 """
 
-import numpy as np 
+import numpy as np
+from prml.utils.util import sigmoid,kappa
 from prml.linear_classifier import Classifier
-from prml.kernel_method import BaseKernel, BaseKernelMachine, DualRegression
+from prml.kernel_method import BaseKernelMachine
 
 
 class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
@@ -243,4 +248,248 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
 
         """
         return self.support_vector
+
+
+class RelevanceVectorMachineRegressor(BaseKernelMachine):
+    """Relevance Vecotr Machine Regressor 
+
+    Attributes:
+        alpha,beta (float): hyper parameter 
+        max_iter (int): max iteration when model optimize parameters 
+        threshold (float) : if error is lower than this, stop iteration
+        weight (array) : weight 
+        sigma (array): sigma 
+        relevance_vector (array): index of relevance vector 
+        relevance_vector_X (array): explanatory variable of relevance vector 
+
+    """
+    def __init__(self,alpha=None,beta=None,max_iter=100,threshold=1e-7,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
+        super(RelevanceVectorMachineRegressor,self).__init__(kernel=kernel, sigma=sigma, a=a, b=b, h=h, theta=theta)
+        self.alpha = alpha 
+        self.beta = beta 
+        self.max_iter = max_iter
+        self.threshold = threshold
+        self.weight = None 
+        self.sigma = None 
+        self.relevance_vector = None 
+        self.relevance_vector_X = None 
+
+    def fit(self,X,y,optimize_param=True):
+        """fit 
+
+        Args:
+            X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
+            y (2-D array) : target variable, shape = (N_samples,1) 
+            optimizer_param (bool): if alpha,beta will be optimized or not
+
+        """
+
+        design_mat = self.gram_func(X) 
+        if self.alpha is None:
+            self.alpha = np.random.randn(design_mat.shape[1]) 
+        if self.beta is None:
+            self.beta = np.random.randn(1)[0]
+
+        self.sigma = np.linalg.inv(np.diag(self.alpha) + self.beta*design_mat.T@design_mat) 
+        self.weight = self.beta*self.sigma@design_mat.T@y 
+
+        if optimize_param:
+            self._optimize(design_mat,X,y)
+        else:
+            self.relevance_vector = np.arange(X.shape[0]).reshape(-1,1) 
+            self.relevance_vector_X = X 
+
+    def _optimize(self,design_mat,X,y):
+        """_optimize 
+
+        Args:
+            design_mat (2-D array) : design_mat of explanatory variable,shape = (N_samples,N_dim)
+            X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
+            y (2-D array) : target variable, shape = (N_samples,1) 
+
+        """
+        N = design_mat.shape[0] 
+
+        for _ in range(self.max_iter): 
+            gamma = 1 - np.diag(self.sigma)*self.alpha  
+            self.alpha = gamma/self.weight.ravel()**2 
+            self.alpha = np.clip(self.alpha,0,1e10)
+            self.beta = (N - gamma.sum()) / np.sum((y - design_mat@self.weight)**2)
+            self.sigma = np.linalg.pinv(np.diag(self.alpha) + self.beta*design_mat.T@design_mat) 
+            weight = self.beta*self.sigma@design_mat.T@y 
+
+            if np.mean((weight - self.weight)**2) < self.threshold:
+                self.weight = weight
+                break 
+            self.weight = weight
+        
+        relevance_vector = np.abs(self.weight) > 1e-3
+        self.weight = self.weight[relevance_vector].reshape(-1,1)
+        n = self.weight.shape[0]
+        self.sigma = self.sigma[np.logical_and(relevance_vector,relevance_vector.ravel())].reshape(n,n)
+        self.relevance_vector = np.arange(N)[relevance_vector.ravel()].reshape(-1,1)
+        self.relevance_vector_X = X[relevance_vector].reshape(-1,1)
+    
+    def predict(self,X,return_std=False):
+        """predict
+
+        Args:
+            X (2-D array) : data,shape = (N_samples,N_dim)
+            return_std (bool) : if std is returned or not 
+
+        Returns:
+            y (2-D array) : predicted value, shape = (N_samples,N_target) 
+
+        """
+
+        design_mat = np.zeros((self.relevance_vector_X.shape[0],X.shape[0]))
+        for i in range(self.relevance_vector_X.shape[0]):
+            design_mat[i] = np.array([self.kernel_func(self.relevance_vector_X[i],X[j]) for j in range(X.shape[0])]) 
+        
+        y = design_mat.T@self.weight 
+        if return_std:
+            std = 1/self.beta + np.diag(design_mat.T@self.sigma@design_mat) 
+            return y,std.reshape(-1,1) 
+        else:
+            return y
+    
+    def number_of_relevance_vector(self):
+        """number_of_relevance_vector
+
+        Returns:
+            number_of_relevance_vector (int) : number_of_relevance_vector
+
+        """
+        return len(self.relevance_vector) 
+    
+    def index_of_relevance_vector(self):
+        """index_of_relevance_vector
+
+        Returns:
+            index_of_relevance_vector (array) : index_of_relevance_vector
+
+        """
+        return self.relevance_vector
+
+
+class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
+    """RelevanceVectorMachineClassifier
+
+    Attributes:
+        alpha (float): hyper parameter 
+        max_iter (int): max iteration when model optimize parameters 
+        threshold (float) : if error is lower than this, stop iteration
+        weight (array) : weight 
+        sigma (array): sigma 
+        relevance_vector (array): index of relevance vector 
+        relevance_vector_X (array): explanatory variable of relevance vector 
+
+    """
+    def __init__(self,alpha=None, max_iter=100,threshold=1e-7,kernel="Linear", sigma=0.1, a=1.0, b=0.0, h=None, theta=1.0):
+        super(RelevanceVectorMachineClassifier,self).__init__(kernel=kernel, sigma=sigma, a=a, b=b, h=h, theta=theta)
+        Classifier.__init__(self) 
+        self.alpha = alpha 
+        self.max_iter = max_iter 
+        self.threshold = threshold 
+        self.weight = None 
+        self.sigma = None
+        self.relevance_vector = None 
+        self.relevance_vector_X = None  
+
+    def fit(self,X,y,optimize_param=True):
+        """fit
+
+        Args:
+            X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
+            optimizer_param (bool): if alpha,beta will be optimized or not
+
+        """ 
+        y = self._onehot_to_label(y) 
+        y = y.reshape(-1,1)
+
+        design_mat = self.gram_func(X) 
+        self.weight = np.random.randn(design_mat.shape[1],1) 
+        if self.alpha is None:
+            self.alpha = np.random.randn(design_mat.shape[1],1) 
+
+        for _ in range(self.max_iter):
+            y_pred = sigmoid(design_mat@self.weight) 
+            grad = self.alpha*self.weight - design_mat.T@(y - y_pred) 
+            B = y_pred*(1 - y_pred)
+            H_inv = np.linalg.pinv(design_mat.T@(B*design_mat) + np.diag(self.alpha.ravel()))  
+            new_weight = self.weight - H_inv@grad 
+            if np.mean((new_weight - self.weight)**2) < self.threshold:
+                self.weight = new_weight
+                break 
+            self.weight = new_weight
+            self.sigma = H_inv 
+
+            if optimize_param:
+                for _ in range(int(self.max_iter/10)):
+                    gamma = 1 - self.alpha*np.diag(H_inv).reshape(-1,1) 
+                    new_alpha = gamma/self.weight**2 
+                    new_alpha = np.clip(new_alpha,0,1e10)
+                    if np.mean((new_alpha - self.alpha)**2) < self.threshold:
+                        self.alpha = new_alpha
+                        break 
+                    self.alpha = new_alpha
+            
+            else:
+                continue
+        
+        relevance_vector = np.abs(self.weight) > 1e-3
+        self.weight = self.weight[relevance_vector].reshape(-1,1)
+        n = self.weight.shape[0]
+        self.sigma = self.sigma[np.logical_and(relevance_vector,relevance_vector.ravel())].reshape(n,n)
+        self.relevance_vector = np.arange(X.shape[0])[relevance_vector.ravel()].reshape(-1,1)
+        self.relevance_vector_X = X[relevance_vector.ravel()]
+
+    def predict(self,X,return_prob=False):
+        """predict 
+
+        Args:
+            X (2-D arrray) : shape = (N_samples,N_dims)
+            return_prob (bool) : if True, return probability 
+
+        Returns:
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
+            or if return_prob == True
+
+            y (1-D array) :  always return probability of belonging to class1 in each record 
+
+        """
+        design_mat = np.zeros((self.relevance_vector_X.shape[0],X.shape[0]))
+        for i in range(self.relevance_vector_X.shape[0]):
+            design_mat[i] = np.array([self.kernel_func(self.relevance_vector_X[i],X[j]) for j in range(X.shape[0])]) 
+        
+        logit = (design_mat.T@self.weight).ravel() 
+        if return_prob:
+            sigma = np.diag(design_mat.T@self.sigma@design_mat) 
+            prob = sigmoid(kappa(sigma)*logit) 
+            return prob  
+        else:
+            y = np.zeros(X.shape[0])
+            y[logit >= 0] = 1
+            return self._inverse_transform(y)  
+    
+    def number_of_relevance_vector(self):
+        """number_of_relevance_vector
+
+        Returns:
+            number_of_relevance_vector (int) : number_of_relevance_vector
+
+        """
+        return len(self.relevance_vector) 
+    
+    def index_of_relevance_vector(self):
+        """index_of_relevance_vector
+
+        Returns:
+            index_of_relevance_vector (array) : index_of_relevance_vector
+
+        """
+        return self.relevance_vector
+            
         
