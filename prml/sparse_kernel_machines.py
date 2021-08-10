@@ -9,6 +9,7 @@
 """
 
 import numpy as np
+from numpy.random import weibull
 from prml.utils.util import sigmoid,kappa
 from prml.linear_classifier import Classifier
 from prml.kernel_method import BaseKernelMachine
@@ -317,7 +318,6 @@ class RelevanceVectorMachineRegressor(BaseKernelMachine):
             self.beta = (N - gamma.sum()) / np.sum((y - design_mat@self.weight)**2)
             self.sigma = np.linalg.pinv(np.diag(self.alpha) + self.beta*design_mat.T@design_mat) 
             weight = self.beta*self.sigma@design_mat.T@y 
-
             if np.mean((weight - self.weight)**2) < self.threshold:
                 self.weight = weight
                 break 
@@ -396,13 +396,12 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
         self.relevance_vector = None 
         self.relevance_vector_X = None  
 
-    def fit(self,X,y,optimize_param=True):
+    def fit(self,X,y):
         """fit
 
         Args:
             X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
-            optimizer_param (bool): if alpha,beta will be optimized or not
 
         """ 
         y = self._onehot_to_label(y) 
@@ -411,39 +410,62 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
         design_mat = self.gram_func(X) 
         self.weight = np.random.randn(design_mat.shape[1],1) 
         if self.alpha is None:
-            self.alpha = np.random.randn(design_mat.shape[1],1) 
+            self.alpha = np.random.rand(design_mat.shape[1],1) 
 
-        for _ in range(self.max_iter):
-            y_pred = sigmoid(design_mat@self.weight) 
-            grad = self.alpha*self.weight - design_mat.T@(y - y_pred) 
-            B = y_pred*(1 - y_pred)
-            H_inv = np.linalg.pinv(design_mat.T@(B*design_mat) + np.diag(self.alpha.ravel()))  
-            new_weight = self.weight - H_inv@grad 
-            if np.mean((new_weight - self.weight)**2) < self.threshold:
-                self.weight = new_weight
+        for i in range(self.max_iter):
+            self.sigma = self._optimize_weight(design_mat,y,max_iter=100)
+            new_alpha = self._optimize_parameter(max_iter=1) # if max_iter is more than 1, doesn't work well
+            n = np.sum((new_alpha != 1e10).astype("int"))
+            if (np.sum((new_alpha - self.alpha)**2)/n)**0.5 < self.threshold:
+                self.alpha = new_alpha
                 break 
-            self.weight = new_weight
-            self.sigma = H_inv 
+            self.alpha = new_alpha  
 
-            if optimize_param:
-                for _ in range(int(self.max_iter/10)):
-                    gamma = 1 - self.alpha*np.diag(H_inv).reshape(-1,1) 
-                    new_alpha = gamma/self.weight**2 
-                    new_alpha = np.clip(new_alpha,0,1e10)
-                    if np.mean((new_alpha - self.alpha)**2) < self.threshold:
-                        self.alpha = new_alpha
-                        break 
-                    self.alpha = new_alpha
-            
-            else:
-                continue
-        
         relevance_vector = np.abs(self.weight) > 1e-3
         self.weight = self.weight[relevance_vector].reshape(-1,1)
         n = self.weight.shape[0]
         self.sigma = self.sigma[np.logical_and(relevance_vector,relevance_vector.ravel())].reshape(n,n)
         self.relevance_vector = np.arange(X.shape[0])[relevance_vector.ravel()].reshape(-1,1)
         self.relevance_vector_X = X[relevance_vector.ravel()]
+    
+    def _optimize_weight(self,design_mat,y,max_iter):
+        """_optimize_weight
+
+        Args:   
+            design_mat (array): design matrix 
+            y (array): target class 
+            max_iter (int): max iteration when model optimize parameters 
+        
+        Returns:
+            H_inv (array) : new covariance of post distribution
+
+        """
+        for _ in range(max_iter):
+            y_pred = sigmoid(design_mat@self.weight) 
+            grad = self.alpha*self.weight - design_mat.T@(y - y_pred) 
+            B = y_pred*(1 - y_pred)
+            H_inv = np.linalg.pinv(design_mat.T@(B*design_mat) + np.diag(self.alpha.ravel()))  
+            self.weight -=  H_inv@grad
+        return H_inv 
+    
+    def _optimize_parameter(self,max_iter):
+        """_optimize_parameter
+
+        Newton method
+
+        Args:   
+            max_iter (int) : max iteration when model optimize parameters 
+        
+        Returns:
+            alpha (array) : new alpha
+
+        """
+        alpha = self.alpha
+        for _ in range(max_iter):
+            gamma = 1 - alpha*np.diag(self.sigma).reshape(-1,1) 
+            alpha = gamma/self.weight**2 
+            alpha = np.clip(alpha,0,1e10)  
+        return alpha 
 
     def predict(self,X,return_prob=False):
         """predict 
