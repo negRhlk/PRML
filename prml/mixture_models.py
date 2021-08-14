@@ -70,6 +70,9 @@ class GaussianMixture():
     """GaussianMixture 
 
     Attributes:
+        K (int): number of cluster 
+        max_iter (int): number of max iteration 
+        threshold (float): threshold 
 
     """
     def __init__(self,K,max_iter=100,threshold=1e-7):
@@ -85,45 +88,67 @@ class GaussianMixture():
         self.max_iter = max_iter 
         self.threshold = threshold
     
-    def fit(self,X,gamma=None):
+    def fit(self,X,init_gamma=None,init_pi=None,init_mu=None,init_sigma=None):
         """fit 
 
+        N := N_samples 
+        M := N_dim 
+        K := number of mixture 
+
         Args:
+            X (2-D array): shape = (N,M), data
+            init_gamma (2-D array): shape = (N,K), initial responsibility
+            init_pi (1-D array): shape = (K), initial pi 
+            init_mu (2-D array): shape = (K,M), initial mus
+            init_sigma (3-D array): shape = (K,M,M), initial sigmas
+        
+        Returns:
+            pi (1-D array): shape = (K) 
+            mu (2-D array): shape = (K,M) 
+            sigma (3-D array): shape = (K,M,M)
 
         """
 
         N = X.shape[0] 
         M = X.shape[1]
-        
+
+        gamma = init_gamma
+        pi = init_pi 
+        mu = init_mu
+        sigma = init_sigma 
+
         if gamma is None: 
-            gamma = np.random.randn(N,self.K)
+            gamma = np.random.rand(N,self.K)
             gamma /= gamma.sum(axis = 1,keepdims=True)
-    
-        mu = np.zeros((self.K,M)) 
-        sigma = np.zeros((self.K,M,M)) 
-        pi = np.zeros(self.K)
         
+        if pi is None:
+            pi = np.zeros(self.K)
+
+        if mu is None:
+            mu = np.zeros((self.K,M)) 
+        
+        if sigma is None:
+            sigma = np.array([np.eye(M) for _ in range(self.K)])
+        
+        before_log_likelihood = -np.Inf 
+
         for _ in range(self.max_iter):
 
             # M step 
             N_k = gamma.sum(axis = 0)
-            new_mu = np.sum(gamma.reshape(N,self.K,1)*X.reshape(N,1,M),axis = 0) / N_k.reshape(-1,1)
+            mu = (gamma.T@X) / N_k.reshape(-1,1) 
             tmp = X.reshape(N,1,M) - mu.reshape(1,self.K,M)
-            new_sigma = np.sum(gamma.reshape(N,self.K,1,1)*(tmp.reshape(N,self.K,M,1)*tmp.reshape(N,self.K,1,M)),axis = 0) / N_k.reshape(-1,1)
-            new_pi = N_k/N
-
-            change = np.mean((new_mu - mu)**2) + np.mean((new_sigma - sigma)**2) + np.mean((new_pi - pi)**2) 
-            if change**0.5 < self.threshold:
-                break 
-
-            mu = new_mu 
-            sigma = new_sigma
-            pi = new_pi
+            sigma = np.sum(gamma.reshape(N,self.K,1,1)*(tmp.reshape(N,self.K,M,1)*tmp.reshape(N,self.K,1,M)),axis = 0) / N_k.reshape(-1,1,1)
+            pi = N_k/N
 
             # E step 
             tmp = X.reshape(N,1,M) - mu.reshape(1,self.K,M)
             normalize_and_pi = (2*np.pi)**(-M/2) * np.linalg.det(sigma)**(-0.5) * pi 
             gauss = normalize_and_pi * np.exp( -0.5 * tmp.reshape(N,self.K,1,M)@sigma.reshape(1,self.K,M,M)@tmp.reshape(N,self.K,M,1)).reshape(N,self.K) 
-            gamma = gauss / gamma.sum(axis = 1,keepdims=True) 
-        
+
+            log_likelihood = np.sum(np.log(gauss.sum(axis = 1))) 
+            if abs(before_log_likelihood - log_likelihood) < self.threshold:
+                break 
+
+            gamma = gauss / gauss.sum(axis = 1,keepdims=True) 
         return pi,mu,sigma
