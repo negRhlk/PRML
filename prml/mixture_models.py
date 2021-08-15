@@ -1,6 +1,8 @@
 """MIxuture Models 
 
     KMeans 
+    GaussianMixture 
+    BernoulliMixture 
 
 """
 
@@ -149,6 +151,87 @@ class GaussianMixture():
             log_likelihood = np.sum(np.log(gauss.sum(axis = 1))) 
             if abs(before_log_likelihood - log_likelihood) < self.threshold:
                 break 
+            before_log_likelihood = log_likelihood
 
             gamma = gauss / gauss.sum(axis = 1,keepdims=True) 
         return pi,mu,sigma
+
+
+class BernoulliMixture():
+    """BernoulliMixture
+
+    Attributes:
+        K (int): number of cluster 
+        max_iter (int): number of max iteration 
+        threshold (float): threshold 
+
+    """
+    def __init__(self,K,max_iter=100,threshold=1e-7):
+        """
+
+        Args:
+            K (int): number of cluster 
+            max_iter (int): number of max iteration 
+            threshold (float): threshold 
+
+        """
+        self.K = K 
+        self.max_iter = max_iter 
+        self.threshold = threshold
+
+    def fit(self,X,init_gamma=None,init_pi=None,init_mu=None):
+        """fit 
+
+        N := N_samples 
+        M := N_dim 
+        K := number of mixture 
+
+        Args:
+            X (2-D array): shape = (N,M), data, value is 0 or 1
+            init_gamma (2-D array): shape = (N,K), initial responsibility
+            init_pi (1-D array): shape = (K), initial pi 
+            init_mu (2-D array): shape = (K,M), initial mus
+
+        Returns:
+            pi (1-D array): shape = (K) 
+            mu (2-D array): shape = (K,M) 
+
+        """
+
+        N = X.shape[0] 
+        M = X.shape[1]
+
+        gamma = init_gamma
+        pi = init_pi 
+        mu = init_mu
+
+        if gamma is None: 
+            gamma = np.random.rand(N,self.K) + 0.10
+            gamma /= gamma.sum(axis = 1,keepdims=True)
+        
+        if pi is None:
+            pi = np.zeros(self.K)
+
+        if mu is None:
+            mu = np.zeros((self.K,M)) 
+        
+        before_log_likelihood = -np.inf
+        for _ in range(self.max_iter):
+
+            # M step 
+            N_k = gamma.sum(axis = 0)
+            mu = (gamma.T@X) / N_k.reshape(-1,1)
+            pi = N_k/N
+
+            # E step 
+            tmp = mu.reshape(1,self.K,M)**X.reshape(N,1,M) * (1.0 - mu.reshape(1,self.K,M))**(1.0 - X.reshape(N,1,M))
+            bern = np.prod(tmp,axis = 2)*pi 
+
+            log_likelihood = np.sum(np.log(bern.sum(axis = 1))) 
+            if abs(before_log_likelihood - log_likelihood) < self.threshold:
+                break 
+            before_log_likelihood = log_likelihood
+
+            gamma = bern / bern.sum(axis = 1,keepdims=True)
+
+        return pi,mu 
