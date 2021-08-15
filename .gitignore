@@ -5,5 +5,8 @@
 /prml/utils/__pycache__/*
 /prml/nn/__pycache__/*
 
+/data/t10k-images-idx3-ubyte.gz
+/data/t10k-labels-idx1-ubyte.gz
+
 test*.py
 todo.txt 
