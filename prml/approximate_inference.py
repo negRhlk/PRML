@@ -1,17 +1,28 @@
 """Approximate Inference 
-    ApproximateGauss1D
-    ApproximateGaussianMixture
+
+    VariationalGauss1D
+    VariationalGaussianMixture
+    VariationalLogisticRegression
+
 """
 
 import numpy as np 
+from math import gamma 
 from scipy.special import psi as digamma 
-from prml.utils.util import _log
 
-class ApproximateGauss1D():
-    """ApproximateGauss1D
+from prml.utils.util import _log,sigmoid,kappa
+from prml.linear_classifier import _logistic_regression_base
+
+class VariationalGauss1D():
+    """VariationalGauss1D
 
     approximately predict posterior distribution for gaussian
 
+    Attributes:
+        a,b (float): parameter for posterior distibution
+        mu,lamda (float): parameter for posterior distibution
+        max_iter (int): max iteration 
+        threshold (float): threshold 
 
     """
     def __init__(self,a=0,b=0,mu=0,lamda=0,max_iter=1000,threshold=1e-2):
@@ -71,10 +82,25 @@ class ApproximateGauss1D():
         self.b = b_N
 
 
-class ApproximateGaussianMixture():
-    """ApproximateGaussianMixture 
+class VariationalGaussianMixture():
+    """VariationalGaussianMixture 
 
     approximately predict posterior distribution for gaussian mixture
+
+    n_sample = N 
+    n_components = K 
+    n_dim = D (expressed as M in fit())
+
+    Attributes:
+        K (int): number of components 
+        alpha (1-D array): shape = (K),param of posterior distribution of pi 
+        beta (1-D array): shape = (K),param of posterior distribution of mu and Lamda
+        m_k (2-D array): shape = (K,D),param of posterior distribution of mu and Lamda
+        W_k (3-D array): shape = (K,D,D),param of posterior distribution of mu and Lamda
+        nu (1-D array): shape = (K),param of posterior distribution of mu and Lamda
+        n_iter (int): number of iteration
+
+        r (2-D array): shape = (N,K),responsibility for data X (after fit() is called)
 
     """
     def __init__(self,K,alpha=None,m=None,beta=1,W=None,nu=None,n_iter=1000):
@@ -176,15 +202,165 @@ class ApproximateGaussianMixture():
         self.beta = beta 
         self.m_k = m_k 
         self.W_k = W_k 
-        self.nu = nu    
+        self.nu = nu   
 
+    def _student(self,X,D,mu,L,nu):
+        norm_const = gamma(D/2 + nu/2)/gamma(nu/2) * np.linalg.det(L)**0.5/(np.pi*nu)**(D/2) 
+        X -= mu
+        mahalanobis_dist = (X.reshape(-1,1,D)@L@X.reshape(-1,D,1)).ravel()
+        st = (1 + mahalanobis_dist/nu)*(-D/2 - nu/2) 
+        return norm_const*st 
+    
+    def prob_density(self,X):
+        """
 
+        predictive density is a mixture of student's t-distributions
+
+        Args:
+            X (2-D array): shape = (N_samples,N_dims) 
         
+        Returns:
+            prob (1-D array): length = N_samples, which is the probability of predictive density
 
-            
+        """
+        D = X.shape[1]
+        prob = np.zeros(X.shape[0])
+        for i in range(self.K):
+            L = (self.nu[i] + 1 - D)*self.beta[i]/(1 + self.beta[i])*self.W_k[i]
+            prob += self.alpha[i]*self._student(X,D,self.m_k[i],L,self.nu[i]+1-D) 
+        prob /= self.alpha.sum()
+        return prob 
 
 
+class VariationalLogisticRegression(_logistic_regression_base):
+    """VariationalLogisticRegression
 
+    m_0 = 0 
+    S_0 = alpha^-1 * I
 
+    Attributes:
+        alpha (float): param for prior distribution for weight
+        xi (1-D array): variational param 
+        a,b (float): param for posterior density for alpha 
+        weight (1-D array): mean of posterior density of weight 
+        S (2-D array): std of posterior density of weight
+        max_iter (int) : max iteration for parameter optimization
+        threshold (float) : threshold for optimizint parameters 
 
+    """
+    def __init__(self,alpha=1e-1,max_iter=100,threshold=1e-2,basis_function="gauss",mu=None,s=None,deg=None):
+        """
 
+        Args:
+            alpha (float): param for prior distribution for weight
+            max_iter (int) : max iteration for parameter optimization
+            threshold (float) : threshold for optimizint parameters 
+            basis_function (str) : "gauss" or "sigmoid" or "polynomial" 
+            mu (1-D array) : mean parameter 
+            s (1-D array) : standard deviation parameter 
+            deg (int) : max degree of polynomial features
+
+        """
+        super(VariationalLogisticRegression,self).__init__(max_iter,threshold,basis_function,mu,s,deg)
+        self.alpha = alpha
+        self.xi = None 
+        self.a = None 
+        self.b = None 
+
+    def fit(self,X,y,init_xi=None,optimize_param=False,init_a=0,init_b=0):
+        """fit
+
+        Args:
+            X (2-D array) : data, shape = (N_samples,N_dims)
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data. 
+            init_xi (1-D array): initial param for xi (variational param)
+            optimize_param (bool): if alpha will be optimized or not
+            init_a,init_b (float): initial param for a,b
+
+        """
+
+        y = self._onehot_to_label(y)
+
+        if init_xi is None:
+            xi = np.random.randn(X.shape[0])
+        elif init_xi.shape[0] != X.shape[0]:
+            raise ValueError("init_xi.shape[0] should be equal to X.shape[0]")
+        else:
+            xi = init_xi
+        
+        self.a = init_a
+        self.b = init_b
+
+        design_mat = self.make_design_mat(X)
+        M = design_mat.shape[1]
+
+        for i in range(self.max_iter):
+
+            # E step
+            lamda = self._lamda(xi) 
+            self.S = np.linalg.inv(self.alpha*np.eye(M) + 2*(lamda*design_mat.T)@design_mat)
+            self.weight = self.S@np.sum((y - 0.5)*design_mat.T,axis = 1,keepdims=True)
+
+            # M step 
+            if optimize_param:
+                new_xi = self._opt_param(init_a,init_b,design_mat)
+            else:
+                new_xi = np.diag(design_mat@(self.S + self.weight*self.weight.ravel())@design_mat.T)**0.5 
+
+            if np.mean((xi - new_xi)**2)**0.5 < self.threshold:
+                xi = new_xi 
+                break 
+
+            xi = new_xi
+
+        self.xi = xi 
+    
+    def _lamda(self,xi):
+        return (sigmoid(xi) - 0.5)/(2*xi)
+    
+    def _opt_param(self,init_a,init_b,design_mat):
+        """
+
+        Args:
+            init_a,init_b (float): initial param for a,b
+            design_mat (2-D array): design_mat
+        
+        Returns:
+            new_xi (1-D array): xi 
+
+        """
+
+        M = design_mat.shape[1]
+        E_wwT = self.S + self.weight*self.weight.ravel()
+        E_wTw = np.diag(E_wwT).sum()
+
+        self.a = init_a + M/2 
+        self.b = init_b + E_wTw/2 
+        self.alpha = self.a/self.b 
+        return np.diag(design_mat@E_wwT@design_mat.T)**0.5
+
+    def predict(self,X,return_prob=False):
+        """predict 
+
+        Args:
+            X (2-D arrray) : shape = (N_samples,N_dims)
+            return_prob (bool) : if True, return probability 
+
+        Returns:
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
+            or if return_prob == True
+
+            y (1-D array) :  always return probability of belonging to class1 in each record 
+
+        """
+        design_mat = self.make_design_mat(X)
+        logit = (design_mat@self.weight).ravel()
+        if return_prob:
+            sigma = np.diag(design_mat@self.S@design_mat.T) 
+            prob = sigmoid(kappa(sigma)*logit)
+            return prob 
+        else:
+            y = np.zeros(X.shape[0])
+            y[logit >= 0] = 1 
+            return self._inverse_transform(y) 
