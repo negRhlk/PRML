@@ -4,6 +4,8 @@
     VariationalGaussianMixture
     VariationalLogisticRegression
 
+    TODO
+        EP_for_noisy_data
 """
 
 import numpy as np 
@@ -364,3 +366,114 @@ class VariationalLogisticRegression(_logistic_regression_base):
             y = np.zeros(X.shape[0])
             y[logit >= 0] = 1 
             return self._inverse_transform(y) 
+
+
+# if v < 0, what does (2*pi*v)**(D/2) mean? this cause error
+
+# class EP_for_noisy_data():
+#     """EP for noisy data
+
+#     Attributes:
+#         D (int): data dimension
+#         m (1-D array): shape = (D), mean of prior distribution
+#         v (float): std of prior distribution 
+#         Ss (1-D array): param of each factor 
+#         Ms (2-D array): mean of each factor 
+#         max_iter (int) : max iteration for parameter optimization
+#         threshold (float) : threshold for optimizint parameters 
+
+#     """
+#     def __init__(self,max_iter=100,threshold=1e-4):
+#         self.max_iter = max_iter 
+#         self.threshold = threshold
+
+#     def fit(self,X,a=10,b=100,w=0.5,m=None,v=None):
+#         """fit 
+
+#         Args:
+#             X (2-D array): shape = (N,D), data
+#             a,b,w (float): param of noisy data
+#             m (1-D array): shape = (D),initial param for prior distribution
+#             v (float): initial param for prior distribution
+
+#         """
+
+#         N = X.shape[0] 
+#         D = X.shape[1] 
+
+#         if m is None: 
+#             m = np.random.randn(D)
+#         elif m.shape[0] != D:
+#             raise ValueError("m.shape[0] != X.shape[1]")
+        
+#         if v is None:
+#             v = 1 
+        
+#         Ss = np.random.randn(N)
+#         Ms = np.random.randn(N,D)
+#         Vs = np.ones(N)
+
+#         def inv(a):
+#             if a > 0:
+#                 return 1/(a + 1e-5)
+#             else:
+#                 return 1/(a - 1e-5)
+#         def gauss(x,m,v):
+#             return inv(2*np.pi*v)**(D/2)*np.exp(-np.sum((x-m)**2)*inv(v))
+
+#         for _ in range(self.max_iter):
+#             param_diff_max = -1e20
+#             for i in range(N):
+#                 v_n = inv(inv(v) - inv(Vs[i]))
+#                 m_n = m + v_n*inv(Vs[i])*(m - Ms[i])
+#                 Z_n = (1 - w)*gauss(X[i],m_n,v_n+1) + w*gauss(X[i],0,a) 
+
+#                 pho_n = 1 - w*inv(Z_n)*gauss(X[i],0,a)
+#                 new_m = m_n + pho_n*v_n*inv(v_n + 1)*(X[i] - m_n) 
+#                 new_v = v_n - pho_n*(v_n)**2*inv(v_n + 1) + pho_n*(1 - pho_n)*(v_n)**2*np.sum((X[i] - m_n)**2)*inv(D*(v_n + 1)**2) 
+
+#                 new_Vi = inv(inv(new_v) - inv(v_n)) 
+#                 new_Mi = m_n + (Vs[i] + v_n)*inv(v_n)*(new_m - m_n) 
+#                 new_Si = Z_n*inv((2*np.pi*Vs[i])**(D/2)*gauss(Ms[i],m_n,Vs[i]+v_n))
+
+#                 param_diff_max = max(param_diff_max,np.abs(new_m - m).max())
+#                 param_diff_max = max(param_diff_max,abs(new_v - v))
+#                 param_diff_max = max(param_diff_max,abs(new_Vi - Vs[i])) 
+#                 param_diff_max = max(param_diff_max,np.abs(new_Mi - Ms[i]).max())
+#                 param_diff_max = max(param_diff_max,abs(new_Si - Ss[i]))
+
+#                 m = new_m 
+#                 v = new_v
+#                 Vs[i] = new_Vi
+#                 Ms[i] = new_Mi
+#                 Ss[i] = new_Si
+
+#             if param_diff_max < self.threshold:
+#                 break 
+        
+#         self.D = D
+#         self.m = m 
+#         self.v = v 
+#         self.Ss = Ss 
+#         self.Ms = Ms 
+#         self.Vs = Vs 
+#         return m,v,Ss,Ms,Vs
+    
+#     def calc_posterior_mean(self):
+#         """calc_posterior_mean
+
+#         Returns:
+#             mean (1-D array): mean of posterior density for theta
+
+#         """
+#         return self.m
+    
+#     def calc_evidence(self):
+#         """calc_evidence
+
+#         Returns:
+#             evidence (float): model evidence 
+
+#         """
+#         B = np.dot(self.m,self.m)/self.v - np.diag(self.Ms@self.Ms.T)/self.Vs 
+#         return (2*np.pi*self.v)**(self.D/2)*np.exp(B/2)*np.prod(self.Ss*(2*np.pi*self.Vs)**(-self.D/2))
