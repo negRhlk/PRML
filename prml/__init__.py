@@ -10,3 +10,4 @@ from prml import kernel_method
 from prml import sparse_kernel_machines
 from prml import mixture_models
 from prml import approximate_inference
+from prml import sampling_methods
