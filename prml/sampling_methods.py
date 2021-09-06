@@ -3,6 +3,9 @@
     InverseFunctionSampling
     BoxMuller 
     GaussianSampling
+    RejectionSampling
+    ImportanceSampling 
+    SIR
 
 """
 
@@ -51,6 +54,21 @@ class BaseSampling(ABC):
             return data.reshape(shape)
         else:
             return data.reshape(shape+(-1,))
+    
+    def calc_expectation(self,f,n = 100):
+        """calc_expectation 
+
+        Args:
+            f (np.ufunc): you want to caluculate expectation of E[f]
+            n (int): number of data to calculate expectation 
+            
+        Returns:
+            E_f (float): expectation of f 
+
+        """
+
+        data = self._sample(n=n) 
+        return f(data)/n 
 
 
 class InverseFunctionSampling(BaseSampling):
@@ -59,17 +77,20 @@ class InverseFunctionSampling(BaseSampling):
     sample data using inverse fucntion method
 
     """
-    def __init__(self,inv_f):
+    def __init__(self,inv_f,a=0,b=1):
         """
 
         Args:
             inv_f (np.ufunc): inverse function of h(y) = \int_{-\infty}^y p(x) dx  
+            a,b (float): appropriate domain of inv_f(), [a,b]
         
         """
         self.inv_f = inv_f
+        self.w = b - a  
+        self.c = a 
 
     def _sample(self, n=100):
-        z = np.random.rand(n)
+        z = np.random.rand(n)*self.w + self.c
         return self.inv_f(z)
 
 
@@ -189,7 +210,7 @@ class RejectionSampling(BaseSampling):
             self.k = self._find_appropriate_k(k_lower,k_upper)
         else:
             self.k = k
-    
+     
     def _find_appropriate_k(self,k_lower,k_upper):
         k_lower = -100 if k_lower is None else k_lower
         k_upper = 100 if k_upper is None else k_upper 
@@ -214,4 +235,139 @@ class RejectionSampling(BaseSampling):
             return np.concatenate((data,additive_data))
         else:
             return data[:n]
+
+
+class ImportanceSampling():
+    """ImportanceSampling 
+
+    Unlike other sampling methods, ImportanceSampling does not sample from 
+    the distribution, but only calculate the expected value.
+
+    """
+    def __init__(self,p,f,q=None,q_sampler=None):
+        """
+
+        Args:
+            p (np.ufunc): probability densiy you want to sample 
+            f (np.ufunc): you want to caluculate expectation of E[f]
+            q (np.ufunc): proposal density 
+            q_sampler (Sampling): proposal distribution sampler
+
+        """
+        self.p = p 
+        self.f = f 
+        if q is None:
+            self.q = lambda x:1/(2*np.pi)**0.5*np.exp(-0.5*x**2)
+            self.q_sampler = GaussSampling() 
+        else:
+            self.q = q 
+            self.q_sampler = q_sampler
+
+    def calc_expectation(self,n=100):
+        """calc_expectation 
+
+        Args:
+            n (int): number of data to calculate expectation 
+
+        Returns:
+            E_f (float): expectation of f 
+
+        """
         
+        x = self.q_sampler.sampling(n=n)
+        r = self.p(x)/self.q(x)
+        f = self.f(x)
+        r /= r.sum() 
+        return np.dot(r,f) 
+
+
+class SIR(BaseSampling):
+    """SIR
+    """
+    def __init__(self,p,q=None,q_sampler=None):
+        """
+
+        Args:
+            p (np.ufunc): probability densiy you want to sample 
+            q (np.ufunc): proposal density 
+            q_sampler (Sampling): proposal distribution sampler
+
+        """
+        self.p = p 
+        if q is None:
+            self.q = lambda x:1/(2*np.pi)**0.5*np.exp(-0.5*x**2)
+            self.q_sampler = GaussSampling() 
+        else:
+            self.q = q 
+            self.q_sampler = q_sampler
+    
+    def _sample(self,n=100):
+        x = self.q_sampler.sampling(n=n)
+        r = self.p(x)/self.q(x)
+        r /= r.sum() 
+
+        # these code can be  replaced by np.random.multinomial(n,r) 
+        w_cumsum = np.cumsum(r) 
+        rv = np.random.rand(n) - 1e-20 # prevent chose_idx from goin to n
+        chose_idx = np.searchsorted(w_cumsum,rv) 
+        return x[chose_idx]
+
+
+class MetropolisHastingsSampling(BaseSampling):
+    """MetropolistHastingsSampling 
+
+    one kind of MCMC 
+    """
+    def __init__(self,p,D,q=None,q_sampler=None,symm=False,first_discard=0.2):
+        """
+
+        Args:  
+            p (np.ufunc): probability density you want to sample 
+            D (int): dimension of p(x)
+            q (np.ufunc): proposal density 
+            q_sampler (Sampler): proposal distribution sampler
+            symm (bool): if q(z1|z2) = q(z2|z1) for all z1,z2, true. 
+            first_dicard (float): first sample of this rate is discarded
+        
+        Note:
+            if q is None and dimension of p is more than 2, this causes error 
+
+        """
+        self.p = p 
+        self.D = D
+        if q is None:
+            self.q = lambda z,z_cond:1/(2*np.pi)**(D/2)*np.exp(-0.5*np.sum((z-z_cond)**2))
+            self.q_sampler = GaussSampling(D = D)
+            symm = True 
+        else:
+            self.q = q 
+            self.q_sampler = q_sampler
+        self.symm = symm
+        self.first_discard = first_discard
+    
+    def _is_accept(self,z,z_next):
+        """
+
+        Return:
+            is_accept (bool): accepct or not
+
+        """
+        if self.symm:
+            accept_prob = self.p(z_next)/self.p(z)
+        else:
+            accept_prob = self.p(z_next)*self.q(z,z_next)/(self.p(z)*self.q(z_next,z))
+        a = np.random.rand()
+        return a <= accept_prob
+
+    def _sample(self,n=100):
+        m = int(n/(1 - self.first_discard) + 5) # neccesay data size
+        d_size = 0
+        data = np.zeros((m,self.D))
+        z = np.random.rand(self.D)
+        while d_size < m:
+            z_next = self.q_sampler.sampling(n=1)[0] + z
+            if self._is_accept(z,z_next):
+                data[d_size] = z_next.copy()
+                z = z_next
+                d_size += 1
+        return data[-n:]    
