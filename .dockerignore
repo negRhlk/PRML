@@ -1,0 +1,15 @@
+.DS_Store 
+*/.ipynb_checkpoints/*
+
+/prml/__pycache__/*
+/prml/utils/__pycache__/*
+/prml/nn/__pycache__/*
+
+/data/t10k-images-idx3-ubyte.gz
+/data/t10k-labels-idx1-ubyte.gz
+
+/test/*
+todo.txt
+.gitignore
+Dockerfile
+README.md
