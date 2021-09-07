@@ -7,6 +7,7 @@
 
 /data/t10k-images-idx3-ubyte.gz
 /data/t10k-labels-idx1-ubyte.gz
+/data/iris.data
 
 test*.py
 todo.txt 
