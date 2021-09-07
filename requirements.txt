@@ -3,4 +3,4 @@ numpy==1.20.3
 matplotlib==3.4.2
 scipy==1.6.3
 Pillow==8.2.0
-scikit-learn==0.24.2 # for data load_iris()
+# scikit-learn==0.24.2 # for data load_iris()
