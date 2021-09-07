@@ -6,11 +6,15 @@
     RejectionSampling
     ImportanceSampling 
     SIR
+    MetropolistHastingsSampling 
+    HybridMonteCarlo
 
 """
 
 from abc import ABC,abstractclassmethod
 import numpy as np 
+
+from prml.utils.util import _log
 
 class BaseSampling(ABC):
     def __init__(self):
@@ -370,4 +374,75 @@ class MetropolisHastingsSampling(BaseSampling):
                 data[d_size] = z_next.copy()
                 z = z_next
                 d_size += 1
-        return data[-n:]    
+        return data[-n:]   
+
+
+class HybridMonteCarlo(BaseSampling):
+    """HybridMonteCarlo
+
+    one kind of MCMC
+    """
+    def __init__(self,p,D,first_decard=0.2,L=1,eps=1e-3):
+        """
+
+        Args:  
+            p (np.ufunc): probability density you want to sample, not necessarily be normalized 
+            D (int): dimension of p(x)
+            first_dicard (float): first sample of this rate is discarded
+            L (int): how many times (r,z) steps in one sampling
+            eps (float): step width is lower than this
+        
+        Note:
+            You should choose eps so carefully to sample data correctly
+
+        """
+        self.E = lambda x:-_log(p(x))
+        self.D = D
+        self.first_discard = first_decard
+        self.L = L
+        self.eps = eps 
+        self.sampler = GaussSampling(D=D)
+    
+    def _dE(self,z):
+        dE = np.zeros(self.D)
+        for i in range(self.D):
+            z[i] += 1e-3
+            dE[i] = self.E(z) 
+            z[i] -= 1e-3 
+        dE = (dE - self.E(z))*1e3 
+        return dE 
+
+    def _leapfrog(self,z,r,eps):
+        # symplectic euler 
+        z_now,r_now = z,r
+        for _ in range(self.L):
+            r_half = r_now - eps/2*self._dE(z_now)
+            z_next = z_now + eps*r_half 
+            r_next = r_half - eps/2*self._dE(z_next)
+            z_now,r_now = z_next,r_next
+        return z_now,r_now
+    
+    def _hamiltonian(self,z,r):
+        return self.E(z) + 0.5*np.sum(r**2)
+
+    def _is_accept(self,z,r,z_next,r_next):
+        H = self._hamiltonian(z,r)
+        H_next = self._hamiltonian(z_next,r_next)
+        return np.random.rand() <= np.exp(H - H_next)
+    
+    def _sample(self,n=100):
+        m = int(n/(1 - self.first_discard) + 5) # neccesary data size
+        d_size = 0
+        data = np.zeros((m,self.D))
+        z = np.random.rand(self.D)
+        r = self.sampler.sampling(n=1)[0]
+        while d_size < m:
+            eps = np.random.rand()*2*self.eps - self.eps # random sample from (-self.eps,self,eps)
+            z_next,r_next = self._leapfrog(z,r,eps) 
+            if self._is_accept(z,r,z_next,r_next):
+                data[d_size] = z_next.copy() 
+                z = z_next
+                r = r_next
+                d_size += 1
+            r = self.sampler.sampling(n=1)[0]
+        return data[-n:]
