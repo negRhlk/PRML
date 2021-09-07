@@ -3,6 +3,7 @@
 """
 
 import numpy as np 
+import os 
 
 class RegressionDataGenerator():
     """RegressionDataGenerator
@@ -121,3 +122,36 @@ class ClassificationDataGenerator3():
             y[np.logical_and(np.logical_not(condition1),condition2)] = 1
             y[np.logical_not(condition2)] = 2
         return X,y 
+
+
+def load_iris():
+    """
+
+    Returns:
+        X (2-D array): explanatary valiable 
+        y (1-D array): class 0,1,2
+        
+    """
+    dict = {
+        "Iris-setosa": 0,
+        "Iris-versicolor": 1,
+        "Iris-virginica": 2
+    }
+    X = []
+    y = [] 
+    file = __file__.rstrip("datasets.py")
+    os.chdir(f"{file}/../../")
+    with open("data/iris.data") as f:
+        data = f.read()
+    
+    for line in data.split("\n"):
+        # sepal length | sepal width | petal length | petal width 
+        if len(line) == 0:
+            continue
+        sl,sw,pl,pw,cl = line.split(",")
+        rec = np.array(list(map(float,(sl,sw,pl,pw))))
+        cl = dict[cl]
+
+        X.append(rec)
+        y.append(cl)
+    return np.array(X),np.array(y)
