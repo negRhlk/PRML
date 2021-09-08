@@ -3,7 +3,7 @@
 """
 
 import numpy as np 
-import os 
+import os,gzip 
 
 class RegressionDataGenerator():
     """RegressionDataGenerator
@@ -155,3 +155,48 @@ def load_iris():
         X.append(rec)
         y.append(cl)
     return np.array(X),np.array(y)
+
+
+def _load_label(file_name):
+    file_path = file_name
+    with gzip.open(file_path, 'rb') as f:
+        labels = np.frombuffer(f.read(), np.uint8, offset=8) 
+    return labels
+
+def _load_image(file_name,normalized):
+    file_path = file_name
+    with gzip.open(file_path, 'rb') as f:
+        images = np.frombuffer(f.read(), np.uint8, offset=16) 
+    if normalized:
+        return images.reshape(-1,28,28)/255.0 
+    else:
+        return images.reshape(-1,28,28)
+
+def load_mnist(label,normalized=True):
+    """
+
+    Args:
+        label (1-D array): label of the datayou want to get 
+        normalized (bool): if image is normalized or not
+    
+    Returns:
+        X (2-D array): image, shape = (N,28,28)
+        y (1-D array): target
+
+    """
+
+    # change directory 
+    file = __file__.rstrip("datasets.py")
+    os.chdir(f"{file}/../../")
+    mnist_data = {
+        "image": "data/t10k-images-idx3-ubyte.gz",
+        "label": "data/t10k-labels-idx1-ubyte.gz"
+    }
+
+    # load image and label
+    image = _load_image(mnist_data["image"],normalized)
+    target = _load_label(mnist_data["label"])
+
+    # select image 
+    idx = np.isin(target,label)  
+    return image[idx],target[idx]
