@@ -172,7 +172,7 @@ def _load_image(file_name,normalized):
     else:
         return images.reshape(-1,28,28)
 
-def load_mnist(label,normalized=True):
+def load_mnist(label=np.arange(10),normalized=True):
     """
 
     Args:
