@@ -7,6 +7,7 @@
 """
 
 import numpy as np 
+from prml.kernel_method import BaseKernelMachine
 
 class PCA():
     """PCA
@@ -357,3 +358,81 @@ class FactorAnalysis():
         self.fit(X,M)
         return self.transform(X)
 
+
+class KernelPCA(BaseKernelMachine):
+    """KernelPCA
+
+    Attributes:
+        a (2-D array): projection weight of pca
+        kernel_func (function) : kernel function k(x,y) 
+        gram_func (function) : function which make gram matrix 
+
+    """
+    def __init__(self,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
+        """
+
+        Args:
+            kernel (string) : kernel type (default "Linear"). you can choose "Linear","Gaussian","Sigmoid","RBF","Exponential"
+            sigma (float) : for "Gaussian" kernel 
+            a,b (float) : for "Sigmoid" kernel
+            h (function) : for "RBF" kernel 
+            theta (float) : for "Exponential" kernel
+
+        """
+        super(KernelPCA,self).__init__(kernel=kernel,sigma=sigma,a=a,b=b,h=h,theta=theta)
+    
+    def fit(self,X):
+        """
+
+        Args:
+            X (2-D array): shape = (N_samples,N_dim), data
+
+        """
+
+        # make gram mat
+        N = X.shape[0]
+        gram_mat = self.gram_func(X)
+        divN = np.ones((N,N))/N 
+        K = gram_mat - divN@gram_mat - gram_mat@divN + divN@gram_mat@divN
+
+        # eig 
+        eig_val,eig_vec = np.linalg.eigh(K)
+        eig_val,eig_vec = np.real(eig_val),np.real(eig_vec.real)
+        idx = np.argsort(eig_val)[::-1]
+        eig_val,eig_vec = eig_val[idx],eig_vec[:,idx]
+        plus = eig_val > 0
+        eig_val,eig_vec = eig_val[plus],eig_vec[:,plus] # if dimension of kernel space is lower than N, K can have eigen values of 0
+        eig_vec /= eig_val**0.5
+
+        self.a = eig_vec 
+        self.X = X
+
+    def transform(self,X,M):
+        """transform 
+
+        Args:
+            X (2-D array): shape = (N_samples,N_dim), data
+
+        Returns:
+            X_proj (2-D array): shape = (N_samples,M), projected data
+
+        """
+        gram_mat = np.zeros((self.X.shape[0],X.shape[0]))
+        for i in range(self.X.shape[0]):
+            gram_mat[i] = np.array([self.kernel_func(self.X[i],X[j]) for j in range(X.shape[0])])
+        
+        return gram_mat.T@self.a[:,:M]
+    
+    def fit_transform(self,X,M):
+        """fit_transform
+
+        Args:
+            X (2-D array): shape = (N_samples,N_dim), data
+            M (int): number of principal component, M is less than X.shape[1]
+
+        Returns:
+            X_proj (2-D array): shape = (N_samples,M), projected data
+
+        """
+        self.fit(X)
+        return self.transform(X,M)
