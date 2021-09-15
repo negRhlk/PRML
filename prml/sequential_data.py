@@ -1,11 +1,17 @@
 """sequential data 
+
     AR
-    
+    BaseHMM 
+    GaussHMM 
+    BernoulliHMM 
+    LDS  
+
 """
 
 import numpy as np 
 from abc import ABC,abstractclassmethod, abstractstaticmethod
 
+from prml.utils.util import _log 
 from prml.utils.encoder import OnehotToLabel
 from prml.linear_regression import LinearRegression
 
@@ -70,6 +76,12 @@ class BaseHMM(ABC):
     """BaseHMM
 
     Attributes:
+        K (int): dimension of latent space
+        pi (1-D array): shape = (K),initial probability 
+        A (2-D array): shape = (K,K),transition probablity 
+        params (object): params 
+        max_iter (int): number of max iteration 
+        threshold (float): threshold 
 
     """
     def __init__(self,K,max_iter=100,threshold=1e-5) -> None:
@@ -179,6 +191,33 @@ class BaseHMM(ABC):
             pred[i] = self._predict(z)
         return pred 
     
+    def viterbi(self,X):
+        """viterbi
+
+        Args:
+            X (2-D array): shape = (N,N_dim), time series data 
+        
+        Returns:
+            series (1-D array): shape = (N), series of most probable latent variables
+
+        """
+
+        N = X.shape[0]
+        omega = np.zeros((N,self.K))
+        before = np.zeros((N,self.K))
+        pXZ = self._prob_cond(X,self.params) 
+        omega[0] = _log(self.pi) + _log(pXZ[0])
+        for i in range(N-1):
+            before[i+1] = np.argmax(_log(self.A) + omega[i].reshape(-1,1),axis = 1)
+            omega[i+1] = _log(pXZ[i+1]) + np.max(_log(self.A) + omega[i].reshape(-1,1),axis = 1)
+        
+        series = np.zeros(N,dtype=np.int32)
+        series[-1] = np.argmax(omega[-1])
+        for i in range(N-2,-1,-1):
+            series[i] = before[i+1,series[i+1]]
+        
+        return series
+
     @abstractclassmethod
     def _specializeMstep(self,X,gamma):
         """_specializeMstep 
@@ -218,6 +257,7 @@ class BaseHMM(ABC):
 
         Returns:
             Ex (1-D array): shape = (N_dim),expected value of X under the conditions of z
+
         """
         pass 
 
@@ -226,6 +266,12 @@ class GaussHMM(BaseHMM):
     """GaussHMM
 
     Attributes:
+        K (int): dimension of latent space
+        pi (1-D array): shape = (K),initial probability 
+        A (2-D array): shape = (K,K),transition probablity 
+        params (object): mu,sigma 
+        max_iter (int): number of max iteration 
+        threshold (float): threshold 
 
     """
     def __init__(self, K, max_iter=100, threshold=1e-5) -> None:
@@ -280,6 +326,7 @@ class GaussHMM(BaseHMM):
 
         Returns:
             Ex (1-D array): shape = (N_dim),expected value of X under the conditions of z
+
         """
         return np.dot(self.params["mu"].T,z)
 
@@ -288,6 +335,12 @@ class BernoulliHMM(BaseHMM):
     """BernoulliHMM
 
     Attributes:
+        K (int): dimension of latent space
+        pi (1-D array): shape = (K),initial probability 
+        A (2-D array): shape = (K,K),transition probablity 
+        params (object): mu
+        max_iter (int): number of max iteration 
+        threshold (float): threshold 
 
     """
     def __init__(self, K, max_iter=100, threshold=1e-5) -> None:
@@ -334,5 +387,205 @@ class BernoulliHMM(BaseHMM):
 
         Returns:
             Ex (1-D array): shape = (N_dim),expected value of X under the conditions of z
+
         """
         return np.dot(self.params["mu"].T,z)
+
+
+class LinearDynamicalSystem():
+    """LinearDynamicalSystem
+
+    Attributes:
+        K (int): dimension of latent space
+        A (2-D array): shape = (K,K), z_{n+1} = Az_n
+        Gamma (2-D array): shape = (K,K) 
+        C (2-D array): shape = (M,K)
+        Sigma (2-D array): shape = (M,M)
+        mu0 (1-D array): shape = (K) 
+        P0 (2-D array): shape = (K,K)
+        max_iter (int): number of max iteration 
+        threshold (float): threshold
+        
+    """
+    def __init__(self,K,max_iter=100,threshold=1e-5) -> None:
+        """init
+
+        Args:
+            K (int): dimension of latent space
+            max_iter (int): number of max iteration 
+            threshold (float): threshold 
+
+        """
+        self.K = K 
+        self.max_iter = max_iter
+        self.threshold = threshold
+
+    def _Estep(self,X,A,Gamma,C,Sigma,mu0,P0):
+        """
+
+        Args:
+            X (2-D array): shape = (N,M) 
+            A (2-D array): shape = (K,K), z_{n+1} = Az_n
+            Gamma (2-D array): shape = (K,K) 
+            C (2-D array): shape = (M,K)
+            Sigma (2-D array): shape = (M,M)
+            mu0 (1-D array): shape = (K) 
+            P0 (2-D array): shape = (K,K)
+        
+        Returns:
+            mu (2-D array): shape = (N,K) 
+            V (3-D array): shape = (N,K,K) 
+            J (3-D array): shape = (N,K,K)
+
+        """
+
+        N = X.shape[0] 
+        mu = np.zeros((N,self.K)) 
+        V = np.zeros((N,self.K,self.K))
+        P = np.zeros((N,self.K,self.K))
+
+        # forward 
+        K = P0@C.T@np.linalg.inv(C@P0@C.T + Sigma)
+        mu[0] = mu0 + np.dot(K,X[0] - np.dot(C,mu0))
+        V[0] = (np.eye(self.K) - K@C)@P0 
+        for i in range(N-1):
+            P[i] = A@V[i]@A.T + Gamma 
+            K = P[i]@C.T@np.linalg.inv(C@P[i]@C.T + Sigma) 
+            mu[i+1] = np.dot(A,mu[i]) + np.dot(K,X[i+1] - np.dot(C@A,mu[i])) 
+            V[i+1] = (np.eye(self.K) - K@C)@P[i]
+        
+        # backward 
+        muhat = np.zeros((N,self.K)) 
+        Vhat = np.zeros((N,self.K,self.K))
+        J = np.zeros((N,self.K,self.K))
+        muhat[-1] = mu[-1]
+        Vhat[-1] = V[-1]
+        for i in range(N-2,-1,-1):
+            J[i] = V[i]@A.T@np.linalg.inv(P[i]) 
+            muhat[i] = mu[i] + np.dot(J[i],muhat[i+1] - np.dot(A,mu[i])) 
+            Vhat[i] = V[i] + J[i]@(Vhat[i+1] - P[i])@J[i].T 
+        
+        return muhat,Vhat,J 
+
+    def _Mstep(self,X,mu,V,J):
+        """
+
+        Args:
+            X (2-D array): shape = (N,M) 
+            mu (2-D array): shape = (N,K) 
+            V (3-D array): shape = (N,K,K) 
+            J (3-D array): shape = (N,K,K)
+        
+        Returns:
+            A (2-D array): shape = (K,K), z_{n+1} = Az_n
+            Gamma (2-D array): shape = (K,K) 
+            C (2-D array): shape = (M,K)
+            Sigma (2-D array): shape = (M,M)
+            mu0 (1-D array): shape = (K) 
+            P0 (2-D array): shape = (K,K)
+
+        """
+
+        N = X.shape[0]
+        E_z = mu 
+        E_zz_d = V[1:]@J[:-1].transpose(0,2,1) + mu[1:].reshape(N-1,self.K,1)*mu[:-1].reshape(N-1,1,self.K) 
+        E_zz = V + mu.reshape(N,self.K,1)*mu.reshape(N,1,self.K)
+        
+        mu0 = E_z[0] 
+        P0 = E_zz[0] - E_z[0].reshape(-1,1)*E_z[0]
+
+        A = np.sum(E_zz_d,axis=0)@np.linalg.inv(np.sum(E_zz[:-1],axis=0))
+        Gamma = np.mean(E_zz[1:] - A@E_zz_d - E_zz_d@A.T + A@E_zz[:-1]@A.T,axis = 0)
+
+        C = X.T@E_z@np.linalg.inv(np.sum(E_zz,axis=0))
+        Sigma = (X.T@X - C@E_z.T@X - X.T@E_z@C.T + C@E_zz.sum(axis=0)@C.T)/N 
+
+        return A,Gamma,C,Sigma,mu0,P0
+
+    def fit(self,X):
+        """fit
+
+        Args:
+            X (2-D array): shape = (N,N_dim),time series data
+
+        """
+
+        N = X.shape[0]
+        M = X.shape[1]
+
+        # random initialize 
+        A = np.random.randn(self.K,self.K) 
+        tmp = np.random.randn(self.K,3)
+        Gamma = tmp@tmp.T 
+        C = np.random.randn(X.shape[1],self.K) 
+        tmp = np.random.randn(X.shape[1],3)
+        Sigma = tmp@tmp.T
+        mu0 = np.random.randn(self.K) 
+        tmp = np.random.randn(self.K,3)
+        P0 = tmp@tmp.T
+
+        for _ in range(self.max_iter):
+            mu,V,J = self._Estep(X,A,Gamma,C,Sigma,mu0,P0) 
+            A_new,Gamma_new,C_new,Sigma_new,mu0_new,P0_new = self._Mstep(X,mu,V,J)
+            
+            diff = 0
+            diff += np.mean((A_new - A)**2) 
+            diff += np.mean((Gamma_new - Gamma)**2) 
+            diff += np.mean((C_new - C)**2) 
+            diff += np.mean((Sigma_new - Sigma)**2) 
+            diff += np.mean((mu0_new - mu0)**2) 
+            diff += np.mean((P0_new - P0)**2) 
+            diff /= 6 
+
+            A = A_new 
+            Gamma = Gamma_new
+            C = C_new 
+            Sigma = Sigma_new
+            mu0 = mu0_new
+            P0 = P0_new
+
+            if diff**0.5 < self.threshold: 
+                break 
+        
+        self.A = A 
+        self.Gamma = Gamma 
+        self.C = C 
+        self.Sigma = Sigma 
+        self.mu0 = mu0 
+        self.P0 = P0  
+
+    def predict(self,X,size=1):
+        """predict
+
+        predict future movement 
+
+        Args:
+            X (2-D array): shape = (N,N_dim),time series data
+            size (int): number of predict data from the lasta data of X 
+        
+        Returns:
+            pred (2-D array): shape = (size,N_dim),predicted variables 
+
+        """
+        N = X.shape[0] 
+        mu = np.zeros((N,self.K)) 
+        V = np.zeros((N,self.K,self.K))
+        P = np.zeros((N,self.K,self.K))
+
+        # forward 
+        K = self.P0@self.C.T@np.linalg.inv(self.C@self.P0@self.C.T + self.Sigma)
+        mu[0] = self.mu0 + np.dot(K,X[0] - np.dot(self.C,self.mu0))
+        V[0] = (np.eye(self.K) - K@self.C)@self.P0 
+        for i in range(N-1):
+            P[i] = self.A@V[i]@self.A.T + self.Gamma 
+            K = P[i]@self.C.T@np.linalg.inv(self.C@P[i]@self.C.T + self.Sigma)
+            mu[i+1] = np.dot(self.A,mu[i]) + np.dot(K,X[i+1] - np.dot(self.C@self.A,mu[i])) 
+            V[i+1] = (np.eye(self.K) - K@self.C)@P[i] 
+        
+        X_pred = np.zeros((size,X.shape[1]))
+        z = mu[-1]
+        for i in range(size):
+            z = np.dot(self.A,z) 
+            X_pred[i] = np.dot(self.C,z)
+        
+        return X_pred 
