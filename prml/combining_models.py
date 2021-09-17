@@ -7,6 +7,8 @@
 import numpy as np 
 from abc import ABC,abstractclassmethod
 
+from numpy.core.fromnumeric import sort
+
 from prml.utils.util import _log 
 from prml.linear_classifier import Classifier
 
@@ -134,3 +136,290 @@ class AdaBoost(Classifier):
         
         y_pred = np.sign(y_pred)
         return self._inverse_transform(y_pred)
+
+
+class CARTRegressor():
+    """CARTRegressor 
+
+    Attributes:
+        lamda (float): regularizatioin parameter
+        tree (object): parameter 
+
+    """
+    def __init__(self,lamda=1e-2):
+        """__init__
+        
+        Args:
+            lamda (float): regularizatioin parameter
+
+        """
+        self.lamda = lamda 
+
+    def fit(self,X,y):
+        """fit 
+
+        Args:
+            X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
+            y (1-D array) : target variable, shape = (N_samples) 
+            
+        """
+
+        N = len(X)
+        leaves = np.zeros(N)
+        num_nodes = 1
+        num_leaves = 1
+        tree = []
+
+        while True:
+            if num_leaves == 0:
+                break
+            for leaf in range(num_nodes-num_leaves,num_nodes):
+                idx = np.arange(N)[leaf == leaves]
+                if len(idx) == 1:
+                    num_leaves -= 1
+                    tree.append({
+                        "border": None, 
+                        "target": y[idx][0]
+                    }) # has no child
+                    continue
+
+                ax,border,score,more_index,less_index = -1,None,1e20,None,None
+                for m in range(X.shape[1]):
+                    now_border,now_score,now_more_index,now_less_index = self._find_boundry(idx,X[idx,m],y[idx])
+                    if now_score < score:
+                        ax,border,score,more_index,less_index = m,now_border,now_score,now_more_index,now_less_index
+
+                if border is None: 
+                    num_leaves -= 1
+                    tree.append({
+                        "border": None,
+                        "target": y[idx].mean()
+                    }) # has no child
+                    continue
+
+                tree.append({
+                    "left_index": num_nodes, 
+                    "right_index": num_nodes+1, 
+                    "border": border, 
+                    "ax": ax
+                })
+
+                leaves[less_index] = num_nodes
+                leaves[more_index] = num_nodes+1 
+
+                num_nodes += 2 
+                num_leaves += 1
+
+        self.tree = tree 
+
+    def _find_boundry(self,idx,X,y):
+        n = len(idx)
+        sort_idx = np.argsort(X)
+        all_sum = np.sum(y)
+        right_sum = all_sum 
+
+        # when all data is in one leaf
+        score_now = self._error_function(y,right_sum/n) + self.lamda 
+        border_index,score = None,score_now
+        pred = np.zeros(n)
+
+        for i in range(n-1):
+            right_sum -= y[sort_idx[i]]
+            left_sum = all_sum - right_sum
+            pred[sort_idx[i+1:]] = right_sum/(n-i-1) 
+            pred[sort_idx[:i+1]] = left_sum/(i+1)
+            score_now = self._error_function(y,pred) + self.lamda*2
+            if score_now < score:
+                border_index,score = i,score_now
+        
+        if border_index is None: # no division
+            return None,1e20,None,None 
+
+        border = X[sort_idx[border_index]]
+        more_index = idx[sort_idx[border_index+1:]] 
+        less_index = idx[sort_idx[:border_index+1]]
+        return border,score,more_index,less_index 
+    
+    def _error_function(self,y,pred):
+        return np.mean((y-pred)**2)
+    
+    def _predict(self,X,p_id=0):
+        if self.tree[p_id]["border"] is None: 
+            return np.zeros(len(X)) + self.tree[p_id]["target"] 
+        
+        ax = self.tree[p_id]["ax"]
+        border = self.tree[p_id]["border"]
+        y = np.zeros(len(X))
+        y[X[:,ax] > border] = self._predict(X[X[:,ax] > border],p_id=self.tree[p_id]["right_index"])
+        y[X[:,ax] <= border] = self._predict(X[X[:,ax] <= border],p_id=self.tree[p_id]["left_index"])
+        return y 
+
+    def predict(self,X):
+        """predict 
+
+        Args:
+            X (2-D array) : explanatory variable, shape = (N_samples,N_dim)
+        
+        Returns: 
+            y (1-D array) : predictive value
+
+        """
+        y = self._predict(X)
+        return y 
+
+
+class CARTClassifier(Classifier):
+    """CARTClassifier 
+
+    Attributes:
+        lamda (float): reguralization parameter 
+        error_function (str): "gini" or "error_rate" or "cross_entropy"
+
+    """
+    def __init__(self,lamda=1e-2,error_function="gini"):
+        """__init__
+
+        Arg:
+            lamda (float): reguralization parameter 
+            error_function (str): "gini" or "error_rate" or "cross_entropy"
+
+        """
+        super(CARTClassifier,self).__init__()
+        self.lamda = lamda 
+        self.error_function = error_function 
+
+    def fit(self,X,y):
+        """fit
+
+        Args:
+            X (2-D array): shape = (N_samples,2),
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
+
+        """
+
+        N = len(X)
+        y = self._onehot_to_label(y).ravel()
+        leaves = np.zeros(N)
+        num_nodes = 1
+        num_leaves = 1
+        tree = []
+
+        while True:
+            if num_leaves == 0:
+                break
+            for leaf in range(num_nodes-num_leaves,num_nodes):
+                idx = np.arange(N)[leaf == leaves]
+                if len(np.unique(y[idx])) == 1:
+                    num_leaves -= 1
+                    tree.append({
+                        "border": None, 
+                        "target": y[idx][0]
+                    }) # has no child
+                    continue
+
+                ax,border,score,more_index,less_index = -1,None,1e20,None,None
+                for m in range(X.shape[1]):
+                    now_border,now_score,now_more_index,now_less_index = self._find_boundry(idx,X[idx,m],y[idx])
+                    if now_score < score:
+                        ax,border,score,more_index,less_index = m,now_border,now_score,now_more_index,now_less_index
+
+                if border is None: 
+                    num_leaves -= 1
+                    tree.append({
+                        "border": None,
+                        "target": round(y[idx].mean())
+                    }) # has no child
+                    continue
+
+                tree.append({
+                    "left_index": num_nodes, 
+                    "right_index": num_nodes+1, 
+                    "border": border, 
+                    "ax": ax
+                })
+
+                leaves[less_index] = num_nodes
+                leaves[more_index] = num_nodes+1 
+
+                num_nodes += 2 
+                num_leaves += 1
+
+        self.tree = tree 
+
+    def _find_boundry(self,idx,X,y):
+        n = len(idx)
+        sort_idx = np.argsort(X)
+        all_sum = np.sum(y)
+        right_sum = all_sum 
+
+        # when all data is in one leaf,
+        # score_now = self._error_function(y,round(right_sum/n)) + self.lamda 
+        # border_index,score = None,score_now
+        border_index,score = None,1e20
+        pred = np.zeros(n)
+
+        for i in range(n-1):
+            right_sum -= y[sort_idx[i]]
+            left_sum = all_sum - right_sum
+            pred[sort_idx[i+1:]] = round(right_sum/(n-i-1))  
+            pred[sort_idx[:i+1]] = round(left_sum/(i+1))
+            score_now = self._error_function(y,pred) + self.lamda*2
+            if score_now < score:
+                border_index,score = i,score_now
+        
+        if border_index is None: # no division
+            return None,1e20,None,None 
+
+        border = X[sort_idx[border_index]]
+        more_index = idx[sort_idx[border_index+1:]] 
+        less_index = idx[sort_idx[:border_index+1]]
+        return border,score,more_index,less_index 
+    
+    def _error_function(self,y,pred):
+        if self.error_function == "error_rate":
+            return (y != pred).astype("int").sum()/len(y) 
+
+        elif self.error_function == "gini":
+            u = np.unique(pred)
+            err = 0 
+            for cl in u:
+                _,count = np.unique(y[pred == cl],return_counts=True)
+                class_rate = count/count.sum()
+                err += np.sum(class_rate*(1 - class_rate))
+            return err 
+
+        elif self.error_function == "cross_entropy":
+            u = np.unique(pred)
+            err = 0 
+            for cl in u:
+                _,count = np.unique(y[pred == cl],return_counts=True)
+                class_rate = count/count.sum()
+                err -= np.sum(class_rate*np.log(class_rate))
+            return err 
+
+        else:
+            raise ValueError(f"there is no error function whose name is {self.error_function}")
+    
+    def _predict(self,X,p_id=0):
+        if self.tree[p_id]["border"] is None: 
+            return np.zeros(len(X)) + self.tree[p_id]["target"] 
+        
+        ax = self.tree[p_id]["ax"]
+        border = self.tree[p_id]["border"]
+        y = np.zeros(len(X))
+        y[X[:,ax] > border] = self._predict(X[X[:,ax] > border],p_id=self.tree[p_id]["right_index"])
+        y[X[:,ax] <= border] = self._predict(X[X[:,ax] <= border],p_id=self.tree[p_id]["left_index"])
+        return y 
+
+    def predict(self,X):
+        """predict 
+
+        Args:
+            X (2-D array) : explanatory variable, shape = (N_samples,2)
+        
+        Returns: 
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
+        """
+        y = self._predict(X)
+        return self._inverse_transform(y) 
