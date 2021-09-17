@@ -9,8 +9,9 @@ from abc import ABC,abstractclassmethod
 
 from numpy.core.fromnumeric import sort
 
-from prml.utils.util import _log 
-from prml.linear_classifier import Classifier
+from prml.utils.util import _log,sigmoid
+from prml.linear_classifier import Classifier,_logistic_regression_base
+from prml.linear_regression import Regression
 
 class AdaBoost(Classifier):
     """AdaBoost 
@@ -422,4 +423,76 @@ class CARTClassifier(Classifier):
 
         """
         y = self._predict(X)
-        return self._inverse_transform(y) 
+        return self._inverse_transform(y)
+
+
+class LinearMixture(Regression):
+    """LinearMixture
+
+    Attributes:
+        K (int): number of mixture modesl 
+        max_iter (int): max iteration 
+        threshold (float): threshold for EM algorithm 
+        pi (1-D array): mixture, which model is chosen
+        weight (2-D array): shape = (K,M), M is dimension of feature space, weight
+        beta (float): precision parameter
+
+    """
+    def __init__(self,K=3,max_iter=100,threshold=1e-3,basis_function="gauss",mu=None,s=None,deg=None):
+        super(LinearMixture,self).__init__(basis_function,mu,s,deg)
+        self.K = K 
+        self.max_iter = max_iter 
+        self.threshold = threshold
+
+    def _gauss(self,x,mu,beta):
+        return (beta/2*np.pi)**0.5 * np.exp(-beta/2*(x-mu)**2)
+
+    def fit(self,X,y):
+        """fit 
+
+        Args:
+            X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
+            y (1-D array) : target variable, shape = (N_samples) 
+
+        """ 
+
+        design_mat = self.make_design_mat(X)
+        N ,M = design_mat.shape
+        gamma = np.random.rand(N,self.K) + 1
+        gamma /= gamma.sum(axis=1,keepdims=True)
+
+        for _ in range(self.max_iter):
+             
+            # M step 
+            pi = gamma.mean(axis = 0)
+            R = gamma.T.reshape(self.K,N,1)
+            weight = np.linalg.inv(design_mat.T@(R*design_mat))@design_mat.T@(R*y.reshape(-1,1))
+            weight = weight.reshape((self.K,M))
+            beta = N/np.sum(gamma*((y.reshape(-1,1) - design_mat@weight.T)))
+
+            # E step 
+            gauss = pi*np.exp(-beta/2*(y.reshape(-1,1) - design_mat@weight.T)**2) + 1e-10
+            new_gamma = gauss/gauss.sum(axis=1,keepdims=True) 
+
+            if np.mean((new_gamma - gamma)**2)**0.5 < self.threshold:
+                gamma = new_gamma 
+                break 
+
+            gamma = new_gamma 
+        
+        self.pi = pi 
+        self.weight = weight 
+        self.beta = beta 
+
+    def predict(self,X):
+        """predict
+
+        Args:
+            X (2-D array) : data,shape = (N_samples,N_dim)
+        Returns:
+            y (1-D array) : predicted value, shape = (N_samples)
+
+        """ 
+        
+        design_mat = self.make_design_mat(X)
+        return np.dot(design_mat@self.weight.T,self.pi)
