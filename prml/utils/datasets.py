@@ -1,5 +1,11 @@
 """Datasets
 
+RegressionDataGenerator 
+ClassificationDataGenerator2
+ClassificationDataGenerator3 
+load_iris 
+load_mnist 
+
 """
 
 import numpy as np 
@@ -9,38 +15,47 @@ class RegressionDataGenerator():
     """RegressionDataGenerator
 
     Create 1-D toy data for regression 
+
     """
     def __init__(self,f):
-        """
+        """__init__ 
+
         Args:
             f (object) : generate 1-D data which follows f(x) + gauss noise 
+
         """
         self.f = f 
     
     def __call__(self,n = 50,lower = 0,upper = 2*np.pi,std = 1): 
         """Make data 
+
         Args:
             n (int) : number of data 
             lower,upper (float) : generate data almost lower <= x <= upper 
             std (float) : std of gauss noise
+
         Returns:
             X (2-D array) : explanatory variable,shape = (N_samples,1)
             y (2-D array) : target variable, shape = (N_samples,1) 
+
         """ 
         X = np.random.rand(n)*(lower - upper) + upper
         y = self.f(X) + np.random.randn(n)*std 
         return X.reshape(-1,1),y.reshape(-1,1)
 
+
 class ClassificationDataGenerator2(): 
-    """ClassificationDataGenerator 
+    """ClassificationDataGenerator2 
 
     Create 2-D toy data for classification, which has 2-class.
+
     """
     def __init__(self,f):
-        """
+        """__init__
 
         Args:
             f (object) : generate 2-D data which decision boundary is given as y = f(x) 
+
         """
         self.f = f 
     
@@ -54,10 +69,12 @@ class ClassificationDataGenerator2():
             x_lower,x_upper (float) : generate data almost x_lower <= x <= x_upper 
             y_lower,y_upper (float) : generate data almost y_lower <= y <= y_upper 
             encoding (str) : "onehot" or "target"
+
         Returns:
             X (2-D array) : explanatory variable.shape = (N_samples,2)
             y (encoding = "onehot") (2-D array) : target variable,shape = (N_samples,2)
             y (encoding = "target") (1-D array) : target variable,shape = (N_samples) 
+
         """ 
         X1 = np.random.rand(n)*(x_upper - x_lower) + x_lower
         X2 = np.random.rand(n)*(y_upper - y_lower) + y_lower
@@ -71,10 +88,12 @@ class ClassificationDataGenerator2():
             y[X2 > self.f(X1)] = 1 
         return X,y 
 
+
 class ClassificationDataGenerator3(): 
-    """ClassificationDataGenerator 
+    """ClassificationDataGenerator3 
 
     Create 2-D toy data for classification, which has 3-class.
+
     """
     def __init__(self,f1,f2):
         """
@@ -85,6 +104,7 @@ class ClassificationDataGenerator3():
         
         Note:
             for all x, f1(x) >= f2(x). 
+
         """
         self.f1 = f1
         self.f2 = f2  
@@ -99,10 +119,12 @@ class ClassificationDataGenerator3():
             x_lower,x_upper (float) : generate data almost x_lower <= x <= x_upper 
             y_lower,y_upper (float) : generate data almost y_lower <= y <= y_upper 
             encoding (str) : "onehot" or "target"
+
         Returns:
             X (2-D array) : explanatory variable.shape = (N_samples,2)
             y (encoding = "onehot") (2-D array) : target variable,shape = (N_samples,3)
             y (encoding = "target") (1-D array) : target variable,shape = (N_samples) 
+
         """ 
         X1 = np.random.rand(n)*(x_upper - x_lower) + x_lower
         X2 = np.random.rand(n)*(y_upper - y_lower) + y_lower

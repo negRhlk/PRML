@@ -1,7 +1,9 @@
-"""Plot
+"""plot
 
-    plot_regressionr1D 
-    plot_classifier
+plot_regressionr1D 
+plot_regression1D_with_std
+plot_classifier
+
 """
 
 import numpy as np 
@@ -22,6 +24,7 @@ def plot_regression1D(X_tr,y_tr,regressor,title,f,lower = 0,upper = 2*np.pi):
         title (string) : title of the plot 
         f (function) : regression function 
         lower,upper (float) : lower <= x <= upper
+
     """
     X = np.linspace(lower,upper,100).reshape(-1,1)
     y_pred = regressor.predict(X) 
@@ -49,6 +52,7 @@ def plot_regression1D_with_std(X_tr,y_tr,regressor,title,f,lower = 0,upper = 2*n
         title (string) : title of the plot 
         f (function) : regression function 
         lower,upper (float) : lower <= x <= upper
+
     """
     X = np.linspace(lower,upper,100).reshape(-1,1)
     y_pred,y_std = regressor.predict(X,return_std=True)
@@ -80,6 +84,7 @@ def plot_classifier(X_tr,y_tr,classifier,title=""):
         y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded 
         classifier (object) : trained classifier 
         title (str) : title of the plot
+
     """
     if y_tr.ndim == 2:
         transform = OnehotToLabel()
