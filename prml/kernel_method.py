@@ -1,9 +1,10 @@
 """kernel methods 
 
-Chapter6 
-    BaseKernelMachine
-    DualRegression 
-    NadarayaWatson 
+chapter6 
+BaseKernelMachine
+DualRegression 
+NadarayaWatson 
+
 """
 
 import numpy as np 
@@ -17,16 +18,19 @@ class BaseKernelMachine():
     Attributes:
         kernel_func (function) : kernel function k(x,y) 
         gram_func (function) : function which make gram matrix 
+
     """
 
     def __init__(self,kernel="Linear",sigma=1.0,a=1.0,b=0.0,h=None,theta=1.0):
         """
+
         Args:
             kernel (string) : kernel type (default "Linear"). you can choose "Linear","Gaussian","Sigmoid","RBF","Exponential"
             sigma (float) : for "Gaussian" kernel 
             a,b (float) : for "Sigmoid" kernel
             h (function) : for "RBF" kernel 
             theta (float) : for "Exponential" kernel
+
         """
         self.kernel_func = None
         if kernel == "Linear":
@@ -54,9 +58,11 @@ class DualRegression(BaseKernelMachine):
         lamda (float) : regularization parameter
         dual_weight (2-D array) : weight 
         X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
+
     """
     def __init__(self,lamda=0.1,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
         """
+
         Args:
             lamda (float) : regularization parameter, (we cannot use lambda)
             kernel (string) : kernel type (default "Linear"). you can choose "Linear","Gaussian","Sigmoid","RBF","Exponential"
@@ -64,6 +70,7 @@ class DualRegression(BaseKernelMachine):
             a,b (float) : for "Sigmoid" kernel
             h (function) : for "RBF" kernel 
             theta (float) : for "Exponential" kernel
+
         """
         super(DualRegression,self).__init__(kernel=kernel,sigma=sigma,a=a,b=b,h=h,theta=theta)
         self.lamda = lamda
@@ -76,6 +83,7 @@ class DualRegression(BaseKernelMachine):
         Args:   
             X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
             y (2-D array) : target variable, shape = (N_samples,1) 
+
         """
         self.X = X 
         N = X.shape[0]
@@ -90,6 +98,7 @@ class DualRegression(BaseKernelMachine):
 
         Returns:
             y (1-D array) : predicted value, shape = (N_samples,1) 
+
         """ 
         gram_mat = np.zeros((self.X.shape[0],X.shape[0]))
         for i in range(self.X.shape[0]):
@@ -108,8 +117,10 @@ class NadarayaWatson():
     """
     def __init__(self,g):
         """
+
         Args:   
             g (function) : function for kernel function, g(|x-x_n|)
+
         """
         self.g = g 
     
@@ -119,6 +130,7 @@ class NadarayaWatson():
         Args:   
             X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
             y (2-D array) : target variable, shape = (N_samples,1) 
+
         """
         self.X = X 
         self.y = y 
@@ -131,6 +143,7 @@ class NadarayaWatson():
 
         Returns:
             y (2-D array) : predicted value, shape = (N_samples,1) 
+
         """ 
         y = np.zeros(X.shape[0])
         for i in range(X.shape[0]):
@@ -148,9 +161,11 @@ class GaussianProcessRegression(BaseKernelMachine):
         gram_func (function) : function which make gram matrix 
         alpha,beta (float) : hyperparameter 
         C_inv (2-D array) : 
+
     """
     def __init__(self,alpha=1.0,beta=5.0,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
         """
+
         Args:
             alpha,beta (float) : hyperparameter 
             kernel (string) : kernel type (default "Linear"). you can choose "Linear","Gaussian","Sigmoid","RBF","Exponential"
@@ -158,6 +173,7 @@ class GaussianProcessRegression(BaseKernelMachine):
             a,b (float) : for "Sigmoid" kernel
             h (function) : for "RBF" kernel 
             theta (float) : for "Exponential" kernel
+
         """
         super(GaussianProcessRegression,self).__init__(kernel=kernel,sigma=sigma,a=a,b=b,h=h,theta=theta)
         self.alpha = alpha 
@@ -169,6 +185,7 @@ class GaussianProcessRegression(BaseKernelMachine):
         Args:   
             X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
             y (2-D array) : target variable, shape = (N_samples,1) 
+
         """
         self.X = X 
         self.y = y 
@@ -185,6 +202,7 @@ class GaussianProcessRegression(BaseKernelMachine):
         Returns:
             y (2-D array) : predicted value, shape = (N_samples,1) 
             std (2-D array) : std of predicted value, shape = (N_samples,1)
+
         """ 
         gram_mat = np.zeros((self.X.shape[0],X.shape[0]))
         for i in range(self.X.shape[0]):
@@ -202,15 +220,16 @@ class GaussianProcessRegression(BaseKernelMachine):
 class GaussianProcessClassifier(BaseKernelMachine,Classifier):
     """GaussianProcessClassifier
 
-
     Attributes:
         kernel_func (function) : kernel function k(x,y) 
         gram_func (function) : function which make gram matrix 
         alpha (float) : hyperparameter
         gamma (float) : noise parameter to ensure C is positive definite  
+
     """
     def __init__(self,alpha=1.0,gamma=0.1,max_iter=100,threshold=1e-2,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
         """
+
         Args:
             alpha (float) : hyperparameter 
             gamma (float) : noise parameter to ensure C is positive definite  
@@ -221,6 +240,7 @@ class GaussianProcessClassifier(BaseKernelMachine,Classifier):
             a,b (float) : for "Sigmoid" kernel
             h (function) : for "RBF" kernel 
             theta (float) : for "Exponential" kernel
+
         """
         super(GaussianProcessClassifier,self).__init__(kernel=kernel,sigma=sigma,a=a,b=b,h=h,theta=theta)
         Classifier.__init__(self) # this part should be fixed 
@@ -236,6 +256,7 @@ class GaussianProcessClassifier(BaseKernelMachine,Classifier):
         Args:
             X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
+
         """
 
         y = self._onehot_to_label(y)
@@ -270,6 +291,7 @@ class GaussianProcessClassifier(BaseKernelMachine,Classifier):
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
             or if return_prob == True
             y (1-D array) :  always return probability of belonging to class1 in each record 
+
         """
         gram_mat = np.zeros((self.X.shape[0],X.shape[0]))
         for i in range(self.X.shape[0]):

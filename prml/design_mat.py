@@ -5,6 +5,7 @@ Basis functions are
     - gauss
     - sigmoid
     - polynomial
+
 """
 import numpy as np 
 from abc import abstractclassmethod,ABCMeta
@@ -16,6 +17,7 @@ class DesignMat(metaclass=ABCMeta):
     Attributes: 
         mu (1-D array) : mean parameter 
         s (1-D array) : standard deviation parameter 
+
     """
     def __init__(self,mu = None,s = None):
         if mu is None:
@@ -38,6 +40,7 @@ class DesignMat(metaclass=ABCMeta):
         
         Returns :
             phi (1-D array) : data.shape = (N_featuredim)
+
         """
         pass 
 
@@ -49,6 +52,7 @@ class DesignMat(metaclass=ABCMeta):
 
         Returns : 
             design_mat (2-D array) : design_mat, shape = (N_samples,N_featuredim)
+
         """
         return np.vstack([self._basis_function(x) for x in X])
 
@@ -59,6 +63,7 @@ class GaussMat(DesignMat):
     Attributes: 
         mu (1-D array) : mean parameter 
         s (1-D array) : standard deviation parameter
+
     """
     def __init__(self,mu = None,s = None):
         super(GaussMat,self).__init__(mu,s) 
@@ -71,6 +76,7 @@ class GaussMat(DesignMat):
         
         Returns :
             phi (1-D array) : data.shape = (N_featuredim)
+
         """
         phi = np.exp(-(x.reshape(-1,1) - self.mu)/(2*self.s**2))
         phi = np.concatenate(([1],phi.ravel()))
@@ -83,6 +89,7 @@ class SigmoidMat(DesignMat):
     Attributes: 
         mu (1-D array) : mean parameter 
         s (1-D array) : standard deviation parameter
+
     """
     def __init__(self,mu = None,s = None):
         super(SigmoidMat,self).__init__(mu,s) 
@@ -95,6 +102,7 @@ class SigmoidMat(DesignMat):
         
         Returns :
             phi (1-D array) : data.shape = (N_featuredim)
+
         """
         a = (x.reshape(-1,1) - self.mu)/self.s
         a = a.ravel() 
@@ -108,6 +116,7 @@ class PolynomialMat(DesignMat):
 
     Attributes:
         deg (int) : max degree of polynomial features
+
     """
     def __init__(self,deg = None):
         super(PolynomialMat,self).__init__() 
@@ -124,11 +133,10 @@ class PolynomialMat(DesignMat):
         
         Returns :
             phi (1-D array) : data.shape = (N_featuredim)
+
         """
         phi = [np.array([1])]
         for n in range(1,self.deg+1): 
             deg_n_feature = np.power(x,n) 
             phi.append(deg_n_feature)
         return np.concatenate(phi) 
-
-

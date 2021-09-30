@@ -1,13 +1,14 @@
 """sampling methods
 
-    InverseFunctionSampling
-    BoxMuller 
-    GaussianSampling
-    RejectionSampling
-    ImportanceSampling 
-    SIR
-    MetropolistHastingsSampling 
-    HybridMonteCarlo
+chapter11
+InverseFunctionSampling
+BoxMuller 
+GaussianSampling
+RejectionSampling
+ImportanceSampling 
+SIR
+MetropolistHastingsSampling 
+HybridMonteCarlo
 
 """
 
@@ -17,6 +18,11 @@ import numpy as np
 from prml.utils.util import _log
 
 class BaseSampling(ABC):
+    """BaseSampling 
+
+    Base class for sampling methods
+
+    """
     def __init__(self):
         pass 
 
@@ -321,6 +327,7 @@ class MetropolisHastingsSampling(BaseSampling):
     """MetropolistHastingsSampling 
 
     one kind of MCMC 
+
     """
     def __init__(self,p,D,q=None,q_sampler=None,symm=False,first_discard=0.2):
         """
@@ -381,6 +388,7 @@ class HybridMonteCarlo(BaseSampling):
     """HybridMonteCarlo
 
     one kind of MCMC
+    
     """
     def __init__(self,p,D,first_decard=0.2,L=1,eps=1e-3):
         """

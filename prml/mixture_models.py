@@ -1,8 +1,9 @@
 """MIxuture Models 
 
-    KMeans 
-    GaussianMixture 
-    BernoulliMixture 
+chapter9
+KMeans 
+GaussianMixture 
+BernoulliMixture 
 
 """
 
@@ -14,7 +15,7 @@ class KMeans():
 
     Attributes:
         K (int): number of cluster 
-            ax_iter (int): number of max iteration 
+        ax_iter (int): number of max iteration 
 
     """
     def __init__(self,K,max_iter=100):

@@ -1,10 +1,11 @@
 """sequential data 
 
-    AR
-    BaseHMM 
-    GaussHMM 
-    BernoulliHMM 
-    LDS  
+chapter13
+AR
+BaseHMM 
+GaussHMM 
+BernoulliHMM 
+LDS  
 
 """
 

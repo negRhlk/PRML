@@ -1,10 +1,9 @@
 """Linear Regression 
 
-Chapter3 
-
-- LinearRegression
-- Ridge
-- BayesianLinearRegression 
+chapter3 
+LinearRegression
+Ridge
+BayesianLinearRegression 
 
 """
 
@@ -15,13 +14,20 @@ import warnings
 from prml.design_mat import GaussMat,SigmoidMat,PolynomialMat
 
 class Regression():
+    """Regression 
+
+    Base class for regressor 
+
+    """
     def __init__(self,basis_function="gauss",mu=None,s=None,deg=None):
         """
+
         Args:
             basis_funtion (str) : "gauss" or "sigmoid" or "polynomial" 
             mu (1-D array) : mean parameter 
             s (1-D array) : standard deviation parameter 
             deg (int) : max degree of polynomial features
+
         """
         if basis_function == "gauss":
             self.make_design_mat = GaussMat(mu = mu,s = s)
@@ -34,18 +40,21 @@ class Regression():
 
 
 class LinearRegression(Regression):
-    """Linear regression 
+    """LinearRegression
     
     Attributes:
         beta (float) : precision parameter 
+
     """
     def __init__(self,basis_function="gauss",mu=None,s=None,deg=None): 
         """
+
         Args:
             basis_funtion (str) : "gauss" or "sigmoid" or "polynomial" 
             mu (1-D array) : mean parameter 
             s (1-D array) : standard deviation parameter 
             deg (int) : max degree of polynomial features
+
         """
         super(LinearRegression,self).__init__(basis_function,mu,s,deg) 
         self.beta = None 
@@ -56,6 +65,7 @@ class LinearRegression(Regression):
         Args:
             X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
             y (2-D array) : target variable, shape = (N_samples,N_target) 
+
         """ 
         N = X.shape[0] 
         K = y.shape[1] 
@@ -69,8 +79,10 @@ class LinearRegression(Regression):
 
         Args:
             X (2-D array) : data,shape = (N_samples,N_dim)
+
         Returns:
             y (2-D array) : predicted value, shape = (N_samples,N_target) 
+
         """ 
         design_mat = self.make_design_mat(X) 
         return np.dot(design_mat,self.weight)
@@ -81,15 +93,18 @@ class Ridge(Regression):
 
     Attributes:
         lamda (float) : regularization parameter 
+
     """
     def __init__(self,lamda=1e-2,basis_function="gauss",mu=None,s=None,deg=None):
         """
+
         Args:
             lamda (float) : regularization parameter 
             basis_funtion (str) : "gauss" or "sigmoid" or "polynomial" 
             mu (1-D array) : mean parameter 
             s (1-D array) : standard deviation parameter 
             deg (int) : max degree of polynomial features
+
         """
         super(Ridge,self).__init__(basis_function,mu,s,deg) 
         self.lamda = lamda 
@@ -100,6 +115,7 @@ class Ridge(Regression):
         Args:
             X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
             y (2-D array) : target variable, shape = (N_samples,N_target) 
+
         """ 
         design_mat = self.make_design_mat(X) 
         M = design_mat.shape[1] 
@@ -110,18 +126,21 @@ class Ridge(Regression):
 
         Args:
             X (2-D array) : data,shape = (N_samples,N_dim)
+
         Returns:
             y (2-D array) : predicted value, shape = (N_samples,N_target) 
+
         """ 
         design_mat = self.make_design_mat(X)
         return np.dot(design_mat,self.weight)
 
 class BayesianLinearRegression(Regression):
-    """Bayesian linear regression 
+    """BayesianLinearRegression
 
     """
     def __init__(self,alpha=1e-1,beta=1e-1,basis_function="gauss",mu=None,s=None,deg=None):
         """
+
         Args:
             alpha (float) : regularization parameter 
             beta (float) : precision parameter 
@@ -130,8 +149,9 @@ class BayesianLinearRegression(Regression):
             s (1-D array) : standard deviation parameter 
             deg (int) : max degree of polynomial features
         
-        Node : 
+        Node: 
             alpha/beta performs as regularization parameter 
+
         """
         super(BayesianLinearRegression,self).__init__(basis_function,mu,s,deg) 
         self.S = None 
@@ -163,11 +183,14 @@ class BayesianLinearRegression(Regression):
     
     def partial_fit(self,X,y):
         """partial fit 
+
         Args:
             X (2-D array) : explanatory variable,shape = (N_samples,N_dim)
             y (1-D array) : target variable, shape = (N_samples) 
+
         Note:
             before this method is called, fit() shouled be called
+
         """
 
         self.N += X.shape[0] 
@@ -186,9 +209,11 @@ class BayesianLinearRegression(Regression):
     
     def _optimize_evidence(self,X,y,max_iter,threshold):
         """optimize evidence
+
         Args:
             max_iter (int) : number of max iteration for optimizing parameter 
             threshold (float) : if error is lower than this, stop iteration
+
         """
 
         design_mat = self.make_design_mat(X) 
@@ -226,6 +251,7 @@ class BayesianLinearRegression(Regression):
         Returns:
             y (1-D array) : predicted value,shape = (N_samples)
             std (1-D array) : std of predicted value, shape = (N_samples)
+            
         """
         design_mat = self.make_design_mat(X) 
         pred = np.dot(design_mat,self.weight).ravel()

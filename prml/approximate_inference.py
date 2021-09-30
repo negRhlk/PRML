@@ -1,11 +1,13 @@
 """Approximate Inference 
 
-    VariationalGauss1D
-    VariationalGaussianMixture
-    VariationalLogisticRegression
+chapter10
+VariationalGauss1D
+VariationalGaussianMixture
+VariationalLogisticRegression
 
-    TODO
-        EP_for_noisy_data
+Todo:
+    EP_for_noisy_data
+
 """
 
 import numpy as np 

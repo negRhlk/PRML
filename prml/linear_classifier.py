@@ -1,14 +1,15 @@
 """Linear Classification Models 
 
 chapter4 
-    linear classifier (loss is least squared error) 
-    ficher's linear discriminant (for 2class)
-    ficher's linear discriminant (for multiple-class)
-    perceptron
-    generative classifier 
-    logistic regression (for 2-class)
-    logistic regression (for multi-class)
-    bayesian logistic regression (for 2-class)
+LinearClassifier 
+Fisher1D
+Fisher
+Perceptron 
+GenerativeClassifier 
+LogisticRegression
+MultiClassLogisticRegression
+BayesianLogisticRegression
+
 """
 
 import numpy as np 
@@ -18,10 +19,14 @@ from prml.utils.encoder import OnehotToLabel,LabelToOnehot
 from prml.design_mat import GaussMat,SigmoidMat,PolynomialMat
 
 class Classifier(): 
-    """
+    """Classifier 
+
+    Base class for classifier 
+
     Attributes:
         weight (array) : paremeter
         transformer (object) : transform class encoding
+
     """
     def __init__(self):
         self.weight = None 
@@ -47,7 +52,7 @@ class Classifier():
 
 
 class LinearClassifier(Classifier): 
-    """Linear Classifier 
+    """LinearClassifier 
 
     solve classification problem by minimizing least-squared-error. 
     this is not so good for classification problem. 
@@ -62,6 +67,7 @@ class LinearClassifier(Classifier):
         Args:
             X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded 
+
         """
         y = self._label_to_onehot(y) 
         one = np.ones((X.shape[0],1))
@@ -76,6 +82,7 @@ class LinearClassifier(Classifier):
         
         Returns: 
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
         """
         one = np.ones((X.shape[0],1))
         X = np.hstack((one,X))
@@ -88,7 +95,7 @@ class LinearClassifier(Classifier):
 
 
 class Fisher1D(Classifier):
-    """fisher's linear discriminant (for 2-class data)
+    """Fisher1D
 
     project onto the line 
     """
@@ -101,6 +108,7 @@ class Fisher1D(Classifier):
         Args:
             X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
+
         """
         y = self._onehot_to_label(y) 
         class0 = X[y == 0]
@@ -124,16 +132,25 @@ class Fisher1D(Classifier):
     
     def fit_transform(self,X,y):
         """fit and transform
+
+        Args:
+            X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
+
+        Returns:
+             y (1-D array) : projection to 1D data
+
         """
         self.fit(X,y)
         return self.transform(X)
 
 
 class Fisher(Classifier):
-    """fisher's linear discriminant 
+    """Fisher
 
     Attributes:
         n_components (int) : the size of dimension in which you want to project the data
+
     """
     def __init__(self,n_components=None):
         super(Fisher,self).__init__() 
@@ -145,6 +162,7 @@ class Fisher(Classifier):
         Args:
             X (2-D array) : data, shape = (N_samples,N_dim)
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded.  
+
         """
         y = self._onehot_to_label(y)
         K = len(np.unique(y)) 
@@ -171,11 +189,20 @@ class Fisher(Classifier):
         
         Returns:
             y (array) : projected data, shape = (N_samples,n_components)
+
         """
         return X@self.weight
     
     def fit_transform(self,X,y):
-        """fit and transform 
+        """fit_transform 
+
+        Args:
+            X (2-D array) : data, shape = (N_samples,N_dim)
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded.  
+        
+        Returns:
+            y (array) : projected data, shape = (N_samples,n_components)
+
         """
         self.fit(X,y)
         return self.transform(X)
@@ -188,12 +215,15 @@ class Perceptron(Classifier):
         learning_rate (float) : learning rate 
         max_iter (int) : max iteration
         phi (object) : basis function ([1] + x)  
+
     """
     def __init__(self,learning_rate=1e-3,max_iter=100):
         """
+
         Args:
             learning_rate (float) : learning rate 
             max_iter (int) : max iteration
+
         """
         super(Perceptron,self).__init__() 
         self.learning_rate = learning_rate 
@@ -202,9 +232,11 @@ class Perceptron(Classifier):
         
     def fit(self,X,y):
         """fit 
+
         Args:
             X (2-D array) : data, shape = (N_samples,N_dims)
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data. 
+
         """
         y = self._onehot_to_label(y) 
         y[y == 0] = -1
@@ -224,8 +256,10 @@ class Perceptron(Classifier):
 
         Args:
             X (2-D arrray) : shape = (N_samples,N_dims)
+
         Returns:
             y_pred (1-D arrat) : shape = (N_samples) values is 1 or -1
+
         """
         
         design_mat = np.vstack([self.phi(x) for x in X])
@@ -236,8 +270,10 @@ class Perceptron(Classifier):
 
         Args:
             X (2-D arrray) : shape = (N_samples,N_dims)
+
         Returns:
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
         """
         design_mat = np.vstack([self.phi(x) for x in X])
         pred = (design_mat@self.weight).ravel()
@@ -247,7 +283,7 @@ class Perceptron(Classifier):
 
 
 class GenerativeClassifier(Classifier):
-    """Generative Classifier 
+    """GenerativeClassifier 
 
     for 2-class 
     this model uses the solution obtained by maximum likehood method. 
@@ -258,6 +294,7 @@ class GenerativeClassifier(Classifier):
         mu2 (1-D array) : mean of normal distribution of class2 
         sigma (2-D array) : std of of normal distribution of class1 and class2
         b (float) : bias parameter
+
     """
     def __init__(self):
         super(GenerativeClassifier,self).__init__() 
@@ -269,9 +306,11 @@ class GenerativeClassifier(Classifier):
     
     def fit(self,X,y):
         """fit 
+
         Args:
             X (2-D array) : data, shape = (N_samples,N_dims)
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data. 
+
         """
         y = self._onehot_to_label(y)
         
@@ -303,8 +342,10 @@ class GenerativeClassifier(Classifier):
 
         Args:
             X (2-D array) : shape = (N_samples,N_dims)
+
         Returns:
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
         """
         
         logit = X@self.weight + self.b 
@@ -318,9 +359,11 @@ class GenerativeClassifier(Classifier):
 
         Args:
             size (int) : number of data to be generated 
+
         Returns:
             X (2-D array) : generated data, shape = (N_samples,N_dims)
             y (2-D array) : generated data, onehotencoded, shape = (N_samples,2)
+
         """
         x = np.random.rand(size) 
         
@@ -339,11 +382,13 @@ class GenerativeClassifier(Classifier):
 class _logistic_regression_base(Classifier):
     def __init__(self,max_iter,threshold,basis_function="gauss",mu=None,s=None,deg=None):
         """
+
         Args:
             basis_funtion (str) : "gauss" or "sigmoid" or "polynomial" 
             mu (1-D array) : mean parameter 
             s (1-D array) : standard deviation parameter 
             deg (int) : max degree of polynomial features
+
         """
         super(_logistic_regression_base,self).__init__() 
         if basis_function == "gauss":
@@ -370,9 +415,11 @@ class LogisticRegression(_logistic_regression_base):
         mu (1-D array) : mean parameter 
         s (1-D array) : standard deviation parameter 
         deg (int) : max degree of polynomial features
+
     """
     def __init__(self,max_iter=30,threshold=1e-2,basis_function="gauss",mu=None,s=None,deg=None):
         """
+
         Args:
             max_iter (int) : max iteration for parameter optimization
             threshold (float) : threshold for optimizint parameters 
@@ -380,6 +427,7 @@ class LogisticRegression(_logistic_regression_base):
             mu (1-D array) : mean parameter 
             s (1-D array) : standard deviation parameter 
             deg (int) : max degree of polynomial features
+
         """
         super(LogisticRegression,self).__init__(max_iter,threshold,basis_function,mu,s,deg)
         
@@ -392,6 +440,7 @@ class LogisticRegression(_logistic_regression_base):
         
         Note:
             optimizing parameters in IRLS
+
         """
         target = self._onehot_to_label(y)
         target = target.reshape(-1,1)
@@ -414,12 +463,14 @@ class LogisticRegression(_logistic_regression_base):
         Args:
             X (2-D arrray) : shape = (N_samples,N_dims)
             return_prob (bool) : if True, return probability 
+
         Returns:
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
 
             or if return_prob == True
 
             y (1-D array) :  always return probability of belonging to class1 in each record 
+
         """
         
         design_mat = self.make_design_mat(X) 
@@ -522,9 +573,11 @@ class BayesianLogisticRegression(_logistic_regression_base):
         mu (1-D array) : mean parameter 
         s (1-D array) : standard deviation parameter 
         deg (int) : max degree of polynomial features
+
     """
     def __init__(self,alpha=1e-2,max_iter=30,threshold=1e-2,learning_rate=1e-2,basis_function="gauss",mu=None,s=None,deg=None):
         """
+
         Args:
             alpha (float) : precision parameter of prior distribution 
             max_iter (int) : max iteration for parameter optimization
@@ -534,6 +587,7 @@ class BayesianLogisticRegression(_logistic_regression_base):
             mu (1-D array) : mean parameter 
             s (1-D array) : standard deviation parameter 
             deg (int) : max degree of polynomial features
+
         """
         super(BayesianLogisticRegression,self).__init__(max_iter,threshold,basis_function,mu,s,deg)
         self.alpha = alpha 
@@ -549,6 +603,7 @@ class BayesianLogisticRegression(_logistic_regression_base):
         
         Note:
             optimizing parameters in gradient descent method 
+
         """
         y = self._onehot_to_label(y) 
         y = y.reshape(-1,1)
@@ -572,12 +627,14 @@ class BayesianLogisticRegression(_logistic_regression_base):
         Args:
             X (2-D arrray) : shape = (N_samples,N_dims)
             return_prob (bool) : if True, return probability 
+
         Returns:
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
 
             or if return_prob == True
 
             y (1-D array) :  always return probability of belonging to class1 in each record 
+
         """
         
         design_mat = self.make_design_mat(X)

@@ -1,9 +1,12 @@
 """Continuous Latent Variables 
 
-    PCA
-    ProbabilisticPCA
-    ProbabilisticPCAbyEM
-    
+chapter12
+PCA
+ProbabilisticPCA
+ProbabilisticPCAbyEM
+FactorAnalysis
+KernelPCA
+
 """
 
 import numpy as np 
@@ -156,7 +159,6 @@ class ProbabilisticPCA():
         """
         self.fit(X)
         return self.transform(X,M)
-
 
 
 class ProbabilisticPCAbyEM():

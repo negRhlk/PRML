@@ -1,10 +1,11 @@
 """Graphical Models
 
-    IteratedConditionModes 
+chapter8
+IteratedConditionModes 
 
-    Todo:
-        SumProduct
-        MaxSum
+Todo:
+    SumProduct
+    MaxSum
 
 """ 
 

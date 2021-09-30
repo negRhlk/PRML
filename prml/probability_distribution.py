@@ -1,19 +1,15 @@
 """Probability Distribution 
 
-Chapter2 
+chapter2 
+Binary
+Multi
+Gaussian1D
+student's t-distribution 
+Histgram
+Parzen
+KNearestNeighbor
+KNeighborClassifier
 
-2-1 Binary Variables 
-    Binary
-2-2 Multinomial Variables 
-    Multi
-2-3 The Gaussian Distribution
-    Gaussian1D
-    student's t-distribution
-2-5 Nonparametric Models 
-    Histgram
-    Parzen
-    KNearestNeighbor
-    KNeighborClassifier
 """
 
 import numpy as np 
@@ -25,6 +21,7 @@ from collections import Counter
 
 class Binary():
     """Binary Variable
+
     Bern(x|mu) = mu^x (1 - mu)^(1 - x)
     Beta(mu|a,b) = Gamma(a + b)/(Gamma(a)Gamma(b)) mu^(a - 1) (1 - mu)^(b - 1)
     estimate posterior distribution for mu 
@@ -32,6 +29,7 @@ class Binary():
     Attributes:
         a (int) : parameter for the beta distribution
         b (int) : parameter for the beta distribution 
+
     """
     def __init__(self,a = 3,b = 3): 
         self.a = a
@@ -42,6 +40,7 @@ class Binary():
 
         Args:
             X (1-D array) : binary variable (0 or 1) 
+
         """
         l = np.sum(X)
         m = len(X) - l 
@@ -50,7 +49,9 @@ class Binary():
         
     def plot(self):
         """plot
+
         plot beta disribution which mu follows
+
         """
         x = np.linspace(0,1,100)
         p = np.power(x,self.a - 1)*np.power(1 - x,self.b - 1)
@@ -70,6 +71,7 @@ class Multi():
     Attributes:
         K (int) : number of class 
         alpha (1-D array) : parameter for dirichlet distributioin
+
     """
     def __init__(self,K,alpha=None):
         self.K = K 
@@ -77,10 +79,12 @@ class Multi():
     
     def fit(self,X):
         """fit
+
         Maximum A Posteriori for the multinomial distribution  
         
         Args:
             X (2-D array) : multinomial variables, shape = (N_samples.K) 
+
         """
         N = X.shape[0]
         m = X.sum()
@@ -93,6 +97,7 @@ class Gaussian1D():
     Attributes:
         mu (float) : parameter for the gaussian distribution
         sigma (float) : parameter for the gaussian distribution 
+
     """
     def __init__(self,mu=0,sigma=1):
         self.mu = mu
@@ -100,10 +105,12 @@ class Gaussian1D():
     
     def fit(self,X):
         """fit 
+
         Maximum A Posteriori for the gaussian distribution 
 
         Args:
             X (1-D array) : shape = (N_samples)
+
         """
         N = len(X)
         mu_ml = X.mean()
@@ -113,7 +120,9 @@ class Gaussian1D():
     
     def plot(self):
         """plot
+
         plot gauss disribution which mu follows
+
         """
         x = np.linspace(self.mu - self.sigma*1.5,self.mu + self.sigma*1.5,100)
         p = np.exp(-(x - self.mu)**2/2/self.sigma)
@@ -138,18 +147,22 @@ def plot_student(mu,lamda,nu):
 
 class Histgram():
     """Histgram 
+
     histgram density estimation method 
 
     Attributes:
         delta (float) : smoothing parameter 
+
     """
     def __init__(self,delta=0.5):
         self.delta = delta 
     
     def fit(self,X):
         """
+
         Args:
             X (1-D array) : shape = (N_samples) 
+
         """
         self.X = X 
         self.ma = max(X)
@@ -173,6 +186,7 @@ class Parzen():
     Attributes:
         kernel (obj) : "gauss" or "hist", type of kernel (or Parzen window)
         h (float) : kind of smoothing paremeter 
+
     """
     def __init__(self,kernel = "gauss",h = 0.5):
         self.kernel = kernel 
@@ -183,6 +197,7 @@ class Parzen():
 
         Args:
             X (1-D array) : shape = (N_samples) 
+
         """
         self.X = X
         self.mi = min(X)
@@ -190,7 +205,9 @@ class Parzen():
     
     def plot(self):
         """plot 
+
         plot distribution
+
         """
         xs = np.linspace(self.mi-self.h,self.ma+self.h,100)
         p = [0]*100
@@ -219,19 +236,24 @@ class Parzen():
 
 
 class KNearestNeighbor():
-    """KNearestNeighbor 
+    """KNearestNeighbor
+
     KNearest neighbor method 
     estimate distribution
 
     Attributes:
         k (int): number of point in the neighbor 
+
     """
     def __init__(self,k=5):
         self.k = k 
+
     def fit(self,X):
         """fit 
+
         Args:
             X (1-D array) : shape = (N_samples) 
+
         """
         self.X = X 
         self.mi = min(X)
@@ -239,7 +261,9 @@ class KNearestNeighbor():
 
     def plot(self):
         """plot 
+
         plot distribution
+
         """
         xs = np.linspace(self.mi-0.1,self.ma+0.1,100)
         p = [0]*100
@@ -256,11 +280,13 @@ class KNearestNeighbor():
 
 class KNeighborClassifier():
     """KNeighborClassifier
+
     classify data using K nearest neighbor 
 
     Args:
         k (int) : number of point in the neighbor 
         color (list) : color list for plot
+
     """
     def __init__(self,k=10):
         self.k = k
@@ -272,6 +298,7 @@ class KNeighborClassifier():
         Args:
             X (2-D array) : shape = (N_samples,2)
             y (1-D array) : shape = (N_samples) label-encoding
+
         """
         self.X = X 
         self.y = y
@@ -283,6 +310,7 @@ class KNeighborClassifier():
 
         Args:
             X (2-D array) : shape = (N_samples,2) 
+
         """
         pred_y = [0]*len(X)
         for i,(a,b) in enumerate(X):
@@ -295,7 +323,9 @@ class KNeighborClassifier():
         
     def plot(self):
         """plot 
+
         show label 
+        
         """
         cmap = ListedColormap(self.color[:len(np.unique(self.y))])
         x_min,y_min = self.X.min(axis = 0)

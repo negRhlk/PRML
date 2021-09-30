@@ -1,13 +1,14 @@
 """combining models 
 
-    AdaBoost
-    CARTRegressor 
-    CARTClassifier 
-    LinearMixture 
-    LogisticMixture 
+chapter14
+AdaBoost
+CARTRegressor 
+CARTClassifier 
+LinearMixture 
+LogisticMixture 
 
-    TODO:
-        In LogisticMixture, inverse matrix cannot be calculated
+Todo:
+    In LogisticMixture, inverse matrix cannot be calculated
 
 """
 

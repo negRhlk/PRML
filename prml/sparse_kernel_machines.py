@@ -1,11 +1,12 @@
 """Sparse Kernel Machines 
 
-    SupportVectorMachineClassifier 
-    RelevanceVectorMachineRegressor 
-    RelevanceVectorMachineClassifier 
+chapter7
+SupportVectorMachineClassifier 
+RelevanceVectorMachineRegressor 
+RelevanceVectorMachineClassifier 
 
-    Todo:
-        SupportVecotrMachineRegressor
+Todo:
+    SupportVecotrMachineRegressor
 """
 
 import numpy as np
@@ -265,6 +266,19 @@ class RelevanceVectorMachineRegressor(BaseKernelMachine):
 
     """
     def __init__(self,alpha=None,beta=None,max_iter=100,threshold=1e-7,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
+        """__init__ 
+
+        Args:
+            alpha,beta (float): hyper parameter 
+            max_iter (int): max iteration when model optimize parameters 
+            threshold (float) : if error is lower than this, stop iteration
+            kernel (string) : kernel type (default "Linear"). you can choose "Linear","Gaussian","Sigmoid","RBF","Exponential"
+            sigma (float) : for "Gaussian" kernel 
+            a,b (float) : for "Sigmoid" kernel
+            h (function) : for "RBF" kernel 
+            theta (float) : for "Exponential" kernel
+
+        """
         super(RelevanceVectorMachineRegressor,self).__init__(kernel=kernel, sigma=sigma, a=a, b=b, h=h, theta=theta)
         self.alpha = alpha 
         self.beta = beta 
@@ -386,6 +400,19 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
 
     """
     def __init__(self,alpha=None, max_iter=100,threshold=1e-7,kernel="Linear", sigma=0.1, a=1.0, b=0.0, h=None, theta=1.0):
+        """__init__
+
+        Args:
+            alpha (float): hyper parameter 
+            max_iter (int): max iteration when model optimize parameters 
+            threshold (float) : if error is lower than this, stop iteration
+            kernel (string) : kernel type (default "Linear"). you can choose "Linear","Gaussian","Sigmoid","RBF","Exponential"
+            sigma (float) : for "Gaussian" kernel 
+            a,b (float) : for "Sigmoid" kernel
+            h (function) : for "RBF" kernel 
+            theta (float) : for "Exponential" kernel
+
+        """
         super(RelevanceVectorMachineClassifier,self).__init__(kernel=kernel, sigma=sigma, a=a, b=b, h=h, theta=theta)
         Classifier.__init__(self) 
         self.alpha = alpha 
@@ -512,6 +539,4 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
             index_of_relevance_vector (array) : index_of_relevance_vector
 
         """
-        return self.relevance_vector
-            
-        
+        return self.relevance_vector     

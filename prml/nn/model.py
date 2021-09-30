@@ -1,13 +1,15 @@
 """Model 
 
-    _Model
-    Regressor
-    Classifier
+chapter5
+_Model
+Regressor
+Classifier
 
 Todo:
     caluculate hessian 
     baysesian nn 
     implementation of optimzer
+
 """
 
 import numpy as np 
@@ -19,6 +21,8 @@ from prml.utils.util import softmax
 class _Model():
     """Model 
 
+    Base Model 
+
     Attributes:
         learning_rate (float) : learning_rate 
         max_iter (int) : number of max iteration when training 
@@ -26,6 +30,7 @@ class _Model():
         batch_size (int) : number of batch size 
         random_state (int) : random state 
         layers (array) : layers  
+
     """
     def __init__(self,learning_rate=1e-1,max_iter=10000,threshold=1e-6,batch_size=100,random_state=0):
         """Model 
@@ -36,6 +41,7 @@ class _Model():
             threshold (float) : threshold 
             batch_size (int) : number of batch size 
             random_state (int) : random state 
+
         """
         self.learning_rate = learning_rate 
         self.max_iter = max_iter
@@ -64,6 +70,7 @@ class _Model():
         Args:
             X (2-D array) : data, shape = (N_samples,N_dims)
             y (2-D array) : data, shape = (N_samples,N_class or N_target) 
+
         """
         flow = X
         for layer in self.layers:
@@ -75,6 +82,7 @@ class _Model():
         """backward  
 
         back propagation 
+
         """
         v = self.loss_layer.backward(1)
         for layer in  self.layers[::-1]:
@@ -88,6 +96,7 @@ class _Model():
             y (2-D array) : data, shape = (N_samples,N_class or N_target)
             loss (loss-layer) : layer which inherits _LossLayer 
             optimizer (str) : "GradientDescent" or "SGD" 
+
         """
         self.loss_layer = loss
         N = X.shape[0]
@@ -119,6 +128,7 @@ class _Model():
 
         Args:
             X (2-D array) : data shape = (N_samples,N_dims) 
+
         """
         for layer in self.layers:
             X = layer.forward(X)
@@ -137,6 +147,7 @@ class ClassifierNN(_Model):
             threshold (float) : threshold 
             batch_size (int) : number of batch size 
             random_state (int) : random state 
+
         """
         super(ClassifierNN,self).__init__(learning_rate,max_iter,threshold,batch_size,random_state)
         self.transformer = None 
@@ -161,6 +172,7 @@ class ClassifierNN(_Model):
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded.
             loss (loss-layer) : layer which inherits _LossLayer 
             optimizer (str) : "GradientDescent" or "SGD" 
+
         """
         y = self._label_to_onehot(y) 
         return super(ClassifierNN,self).fit(X,y,loss,optimizer)
@@ -174,6 +186,7 @@ class ClassifierNN(_Model):
         
         Returns:
             softmax (2-D array) : classification 
+
         """
         feature = super(ClassifierNN,self).predict(X)
         prob = softmax(feature)
@@ -185,4 +198,3 @@ class ClassifierNN(_Model):
             for k in range(onehot.shape[1]):
                 onehot[clas == k,k] = 1
             return self._inverse_transform(onehot)
-

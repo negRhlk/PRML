@@ -1,15 +1,16 @@
 """Layers 
 
-    Dense
+Dense
 
-    Activation Layers:
-        Tanh
-        Relu
-    
-    Loss Layers:
-        MeanSquaerdErroor 
-        SigmoidCrossEntropy 
-        SoftmaxCrossEntropy 
+Activation Layers:
+    Tanh
+    Relu
+
+Loss Layers:
+    MeanSquaerdErroor 
+    SigmoidCrossEntropy 
+    SoftmaxCrossEntropy 
+
 """
 
 import numpy as np 
@@ -47,6 +48,7 @@ class Dense(_Layer):
         output_size (int) : output data shape is (N_samples,output_shape) 
         W,b (array) : parameter for this layer 
         X (2-D array) : data which is used the last time data was forward
+
     """
     def __init__(self,output_size):
         super(Dense,self).__init__() 
@@ -63,6 +65,7 @@ class Dense(_Layer):
         
         Returns:
             X (2-D array) : data, shape is (N_samples,output_size)
+
         """
         self.X = X
         if not self.initialize:
@@ -80,6 +83,7 @@ class Dense(_Layer):
         
         Returns:
             dX (2-D array) : the last layer's loss, shape is (N_samples,N_dims) 
+
         """
         dX = np.dot(loss,self.W.T)
         dW = np.dot(self.X.T,loss)
@@ -114,6 +118,7 @@ class Tanh(_ActivationLayer):
         
         Returns:
             relu (2-D array) : Tanh(X)
+
         """
         self.X = X
         plus = X > 0 
@@ -130,6 +135,7 @@ class Tanh(_ActivationLayer):
         
         Returns:
             dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+
         """
         plus = self.X > 0 
         minus = self.X <= 0 
@@ -143,6 +149,7 @@ class Relu(_ActivationLayer):
     """Relu Layer 
 
     Relu is non-differentiable at x = 0. Derivative value at x = 0 is define as 1 in this layer. 
+
     """
     def __init__(self):
         super(Relu,self).__init__() 
@@ -156,6 +163,7 @@ class Relu(_ActivationLayer):
         
         Returns:
             relu (2-D array) : Relu(X)
+
         """
         self.X = X
         return np.where(X > 0,X,0)
@@ -167,6 +175,7 @@ class Relu(_ActivationLayer):
         
         Returns:
             dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+
         """
         dX = np.zeros_like(self.X)
         dX[self.X >= 0] = 1
@@ -186,6 +195,7 @@ class MeanSquaredError(_LossLayer):
     """MeanSquaredError
 
     loss layer  used in regression problems 
+
     """
     def __init__(self):
         super(MeanSquaredError,self).__init__()
@@ -200,6 +210,7 @@ class MeanSquaredError(_LossLayer):
         
         Return:
             loss (float) : mean squared loss 
+
         """
         self.predict = predict
         self.target = target  
@@ -209,10 +220,13 @@ class MeanSquaredError(_LossLayer):
 
         Args:
             loss (2-D array) : 1 
+
         Returns:
             dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+
         Note:
             loss layer is always receive 1 when backward  
+
         """
         shape = self.target.shape[0]
         dX = loss*(self.predict - self.target)/shape
@@ -222,6 +236,7 @@ class SigmoidCrossEntropy(_LossLayer):
     """sigmoid activation function and cross entropy loss 
 
     this layer is sigmoid layer which has binary cross entropy loss 
+
     """
     def __init__(self): 
         super(SigmoidCrossEntropy,self).__init__() 
@@ -237,6 +252,7 @@ class SigmoidCrossEntropy(_LossLayer):
         
         Returns:
             loss (float) : cross entropy of sigmoid(X) and target 
+
         """
         self.predict = softmax(X) 
         self.target = target 
@@ -247,10 +263,13 @@ class SigmoidCrossEntropy(_LossLayer):
 
         Args:
             loss (2-D array) : 1 
+
         Returns:
             dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+
         Note:
             loss layer is always receive 1 when backward  
+
         """
         shape = self.target.shape[0] 
         return loss*(self.predict - self.target)/shape 
@@ -259,6 +278,7 @@ class SoftmaxCrossEntropy(_LossLayer):
     """Softmax Cross Entropy 
 
     this layer is softmax layer which has cross entropy loss 
+
     """
 
     def __init__(self): 
@@ -272,8 +292,10 @@ class SoftmaxCrossEntropy(_LossLayer):
         Args:
             X (2-D array) : data, shape = (N_samples,N_class)
             target (2-D array) : ground truth, shape = (N_samples,N_class)
+
         Return:
             loss (float) : cross entropy loss 
+
         """
         self.predict = softmax(X)  
         self.target = target 
@@ -284,10 +306,13 @@ class SoftmaxCrossEntropy(_LossLayer):
 
         Args:
             loss (2-D array) : 1 
+
         Returns:
             dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+
         Note:
             loss layer is always receive 1 when backward  
+            
         """
         shape = self.target.shape[0]
         return loss*(self.predict - self.target)/shape 
