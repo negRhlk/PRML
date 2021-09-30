@@ -1,6 +1,13 @@
 """combining models 
 
     AdaBoost
+    CARTRegressor 
+    CARTClassifier 
+    LinearMixture 
+    LogisticMixture 
+
+    TODO:
+        In LogisticMixture, inverse matrix cannot be calculated
 
 """
 
@@ -457,7 +464,7 @@ class LinearMixture(Regression):
         """ 
 
         design_mat = self.make_design_mat(X)
-        N ,M = design_mat.shape
+        N,M = design_mat.shape
         gamma = np.random.rand(N,self.K) + 1
         gamma /= gamma.sum(axis=1,keepdims=True)
 
@@ -468,7 +475,7 @@ class LinearMixture(Regression):
             R = gamma.T.reshape(self.K,N,1)
             weight = np.linalg.inv(design_mat.T@(R*design_mat))@design_mat.T@(R*y.reshape(-1,1))
             weight = weight.reshape((self.K,M))
-            beta = N/np.sum(gamma*((y.reshape(-1,1) - design_mat@weight.T)))
+            beta = N/np.sum(gamma*(y.reshape(-1,1) - design_mat@weight.T)**2)
 
             # E step 
             gauss = pi*np.exp(-beta/2*(y.reshape(-1,1) - design_mat@weight.T)**2) + 1e-10
@@ -496,3 +503,119 @@ class LinearMixture(Regression):
         
         design_mat = self.make_design_mat(X)
         return np.dot(design_mat@self.weight.T,self.pi)
+
+
+class LogisticMixture(_logistic_regression_base):
+    """LogisticMixture
+
+    Attributes:
+        K (int): number of mixture models
+        max_iter (int) : max iteration for parameter optimization
+        threshold (float) : threshold for optimizint parameters 
+        mu (1-D array) : mean parameter 
+        s (1-D array) : standard deviation parameter 
+        deg (int) : max degree of polynomial features
+    
+    Note:
+        In many cases, inverse matrix cannot be calculated.
+
+    """
+    def __init__(self,K=3,max_iter=100,threshold=1e-3,basis_function="gauss",mu=None,s=None,deg=None):
+        """__init__
+
+        Args:
+            K (int): number of mixture models
+            max_iter (int) : max iteration for parameter optimization
+            threshold (float) : threshold for optimizint parameters 
+            mu (1-D array) : mean parameter 
+            s (1-D array) : standard deviation parameter 
+            deg (int) : max degree of polynomial features
+            
+        """
+        super(LogisticMixture,self).__init__(max_iter,threshold,basis_function,mu,s,deg) 
+        self.K = K 
+
+    def fit(self,X,y):
+        """fit 
+
+        Args:
+            X (2-D array): shape = (N_samples,N_dim),
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
+
+        """
+        t = self._onehot_to_label(y)
+        t = t.reshape(-1,1)
+        design_mat = self.make_design_mat(X)
+        N = design_mat.shape[0]
+        gamma = np.random.rand(N,self.K) + 1
+        gamma /= gamma.sum(axis=1,keepdims=True)
+        weight = None 
+
+        for _ in range(self.max_iter):
+             
+            # M step 
+            pi = gamma.mean(axis = 0)
+            weight = self._Mstep(design_mat,t,gamma,weight) 
+            y = sigmoid(design_mat@weight.T) 
+
+            # E step 
+            prob = pi*(y**t)*((1-y)**(1-t)) + 1e-10
+            new_gamma = prob/prob.sum(axis=1,keepdims=True)
+
+            if np.mean((new_gamma - gamma)**2)**0.5 < self.threshold:
+                gamma = new_gamma 
+                break 
+
+            gamma = new_gamma 
+        
+        self.pi = pi 
+        self.weight = weight 
+    
+    def _Mstep(self,design_mat,t,gamma,weight):
+        M = design_mat.shape[1] 
+        if weight is None:
+            weight = np.random.randn(self.K,M) 
+        
+        for _ in range(4):
+            y = sigmoid(design_mat@weight.T) 
+
+            # gradient
+            tmp = gamma*(y - t)
+            dQ = tmp.T@design_mat 
+
+            # hessian 
+            tmp1 = gamma*y*(1 - y) 
+            tmp2 = design_mat.reshape(-1,M,1)*design_mat.reshape(-1,1,M) 
+            H = np.sum(tmp1.T.reshape(self.K,-1,1,1)*tmp2,axis=1)
+            print(H)
+
+            dweight = np.squeeze(np.linalg.inv(H)@dQ.reshape(self.K,M,1))  
+            if np.mean(np.abs(dweight)) < self.threshold:
+                weight -= dweight
+                return weight 
+            weight -= dweight
+        return weight 
+
+    def predict(self,X,return_prob=False):
+        """predict 
+
+        Args:
+            X (2-D arrray) : shape = (N_samples,N_dims)
+            return_prob (bool) : if True, return probability 
+
+        Returns:
+            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+
+            or if return_prob == True
+
+            y (1-D array) :  always return probability of belonging to class1 in each record 
+
+        """
+        design_mat = self.make_design_mat(X) 
+        y = np.dot(sigmoid(design_mat@self.weight.T),self.pi)
+        if return_prob:
+            return y 
+        else:
+            y = np.zeros(X.shape[0])
+            y[y >= 0.5] = 1
+            return self._inverse_transform(y)
