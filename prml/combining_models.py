@@ -1,11 +1,7 @@
 """combining models 
 
-chapter14
-AdaBoost
-CARTRegressor 
-CARTClassifier 
-LinearMixture 
-LogisticMixture 
+This module is about chapter14. 
+AdaBoost, CARTRegressor, CARTClassifier, LinearMixture, LogisticMixture are implemented.
 
 Todo:
     In LogisticMixture, inverse matrix cannot be calculated
@@ -13,9 +9,6 @@ Todo:
 """
 
 import numpy as np 
-from abc import ABC,abstractclassmethod
-
-from numpy.core.fromnumeric import sort
 
 from prml.utils.util import _log,sigmoid
 from prml.linear_classifier import Classifier,_logistic_regression_base
@@ -126,10 +119,10 @@ class AdaBoost(Classifier):
         """predict 
 
         Args:
-            X (2-D array) : explanatory variable, shape = (N_samples,2)
+            X (2-D array): explanatory variable, shape = (N_samples,2)
         
         Returns: 
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
 
         """
 
@@ -270,7 +263,7 @@ class CARTRegressor():
             X (2-D array) : explanatory variable, shape = (N_samples,N_dim)
         
         Returns: 
-            y (1-D array) : predictive value
+            1-D array: predictive value
 
         """
         y = self._predict(X)
@@ -302,7 +295,7 @@ class CARTClassifier(Classifier):
 
         Args:
             X (2-D array): shape = (N_samples,2),
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
 
         """
 
@@ -427,7 +420,7 @@ class CARTClassifier(Classifier):
             X (2-D array) : explanatory variable, shape = (N_samples,2)
         
         Returns: 
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
 
         """
         y = self._predict(X)
@@ -497,8 +490,9 @@ class LinearMixture(Regression):
 
         Args:
             X (2-D array) : data,shape = (N_samples,N_dim)
+
         Returns:
-            y (1-D array) : predicted value, shape = (N_samples)
+            1-D array: predicted value, shape = (N_samples)
 
         """ 
         
@@ -605,11 +599,8 @@ class LogisticMixture(_logistic_regression_base):
             return_prob (bool) : if True, return probability 
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
-
-            or if return_prob == True
-
-            y (1-D array) :  always return probability of belonging to class1 in each record 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting.
+                                    If return_prob == True, always return probability of belonging to class1 in each record 
 
         """
         design_mat = self.make_design_mat(X) 

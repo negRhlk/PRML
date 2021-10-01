@@ -1,14 +1,8 @@
 """sampling methods
 
-chapter11
-InverseFunctionSampling
-BoxMuller 
-GaussianSampling
-RejectionSampling
-ImportanceSampling 
-SIR
-MetropolistHastingsSampling 
-HybridMonteCarlo
+This module is about chapter11. 
+InverseFunctionSampling, BoxMuller, GaussianSampling, RejectionSampling, ImportanceSampling, SIR, MetropolistHastingsSampling, HybridMonteCarlo
+are implemented. 
 
 """
 
@@ -34,7 +28,7 @@ class BaseSampling(ABC):
             n (int): number of data 
 
         Returns:
-            data (array): sampled data
+            array: sampled data
 
         """
         pass 
@@ -47,7 +41,7 @@ class BaseSampling(ABC):
             shape (Tuple[int, ...]): if shape is None, no reshaping
         
         Returns:
-            data (array): sampled data, shape follows argment "shape"
+            array: sampled data, shape follows argment "shape"
 
         """
         if shape is not None:
@@ -73,7 +67,7 @@ class BaseSampling(ABC):
             n (int): number of data to calculate expectation 
             
         Returns:
-            E_f (float): expectation of f 
+            float: expectation of f 
 
         """
 
@@ -280,7 +274,7 @@ class ImportanceSampling():
             n (int): number of data to calculate expectation 
 
         Returns:
-            E_f (float): expectation of f 
+            float: expectation of f 
 
         """
         
@@ -359,7 +353,7 @@ class MetropolisHastingsSampling(BaseSampling):
     def _is_accept(self,z,z_next):
         """
 
-        Return:
+        Returns:
             is_accept (bool): accepct or not
 
         """

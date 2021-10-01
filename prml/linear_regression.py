@@ -1,6 +1,6 @@
 """Linear Regression 
 
-chapter3 
+This module is about chapter3.
 LinearRegression
 Ridge
 BayesianLinearRegression 

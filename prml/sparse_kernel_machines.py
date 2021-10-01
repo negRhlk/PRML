@@ -1,16 +1,13 @@
 """Sparse Kernel Machines 
 
-chapter7
-SupportVectorMachineClassifier 
-RelevanceVectorMachineRegressor 
-RelevanceVectorMachineClassifier 
+This module is about chapter7. 
+SupportVectorMachineClassifier, RelevanceVectorMachineRegressor, RelevanceVectorMachineClassifier are implemented.
 
 Todo:
     SupportVecotrMachineRegressor
 """
 
 import numpy as np
-from numpy.random import weibull
 from prml.utils.util import sigmoid,kappa
 from prml.linear_classifier import Classifier
 from prml.kernel_method import BaseKernelMachine
@@ -29,9 +26,9 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
         support_vector (array): index of support vector 
         support_vector_X (array): explanatory variable of support vector 
         support_vector_y (array): target of support vector 
-
-    Reference:
-        https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-98-14.pdf
+    
+    Note:
+        This is based on https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-98-14.pdf
 
     """
     def __init__(self,C=20.0,eps=1e-3,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
@@ -102,7 +99,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             i2 (int) : index of the data which will be optimized 
         
         Returns:
-            num_changed (int) : parameter was changed or not 
+            int: parameter was changed or not 
 
         """
         y2 = self.y[i2] 
@@ -132,7 +129,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             E2 (float) : error of data[i2]
         
         Returns:
-            updated_or_not (bool): if parameter was updated or not 
+            bool: if parameter was updated or not 
 
         """
         if i1 == i2:
@@ -218,9 +215,8 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
             return_prob (bool) : if True, return probability 
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
-            or if return_prob == True
-            y (1-D array) :  always return probability of belonging to class1 in each record 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting.
+                                    If return_prob == True, always return probability of belonging to class1 in each record 
 
         """
         gram_mat = np.zeros((self.support_vector_X.shape[0],X.shape[0]))
@@ -237,7 +233,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
         """number_of_support_vector
 
         Returns:
-            number_of_support_vector (int) : number of support vector
+            int: number of support vector
 
         """
         return len(self.support_vector) 
@@ -246,7 +242,7 @@ class SupportVectorMachineClassifier(BaseKernelMachine,Classifier):
         """index_of_support_vector
 
         Returns:
-            index_of_support_vector (array) : index_of_support_vector
+            array: index_of_support_vector
 
         """
         return self.support_vector
@@ -352,7 +348,7 @@ class RelevanceVectorMachineRegressor(BaseKernelMachine):
             return_std (bool) : if std is returned or not 
 
         Returns:
-            y (2-D array) : predicted value, shape = (N_samples,N_target) 
+            2-D array: predicted value, shape = (N_samples,N_target) 
 
         """
 
@@ -371,7 +367,7 @@ class RelevanceVectorMachineRegressor(BaseKernelMachine):
         """number_of_relevance_vector
 
         Returns:
-            number_of_relevance_vector (int) : number_of_relevance_vector
+            int: number_of_relevance_vector
 
         """
         return len(self.relevance_vector) 
@@ -380,7 +376,7 @@ class RelevanceVectorMachineRegressor(BaseKernelMachine):
         """index_of_relevance_vector
 
         Returns:
-            index_of_relevance_vector (array) : index_of_relevance_vector
+            array: index_of_relevance_vector
 
         """
         return self.relevance_vector
@@ -464,7 +460,7 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
             max_iter (int): max iteration when model optimize parameters 
         
         Returns:
-            H_inv (array) : new covariance of post distribution
+            array: new covariance of post distribution
 
         """
         for _ in range(max_iter):
@@ -484,7 +480,7 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
             max_iter (int) : max iteration when model optimize parameters 
         
         Returns:
-            alpha (array) : new alpha
+            array: new alpha
 
         """
         alpha = self.alpha
@@ -502,11 +498,9 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
             return_prob (bool) : if True, return probability 
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting.
+                                    If return_prob == True, always return probability of belonging to class1 in each record 
 
-            or if return_prob == True
-
-            y (1-D array) :  always return probability of belonging to class1 in each record 
 
         """
         design_mat = np.zeros((self.relevance_vector_X.shape[0],X.shape[0]))
@@ -527,7 +521,7 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
         """number_of_relevance_vector
 
         Returns:
-            number_of_relevance_vector (int) : number_of_relevance_vector
+            int: number_of_relevance_vector
 
         """
         return len(self.relevance_vector) 
@@ -536,7 +530,7 @@ class RelevanceVectorMachineClassifier(BaseKernelMachine,Classifier):
         """index_of_relevance_vector
 
         Returns:
-            index_of_relevance_vector (array) : index_of_relevance_vector
+            array: index_of_relevance_vector
 
         """
         return self.relevance_vector     

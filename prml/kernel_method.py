@@ -1,9 +1,7 @@
 """kernel methods 
 
-chapter6 
-BaseKernelMachine
-DualRegression 
-NadarayaWatson 
+This module is about chapter6.
+BaseKernelMachine, DualRegression, NadarayaWatson are implemented. 
 
 """
 
@@ -97,7 +95,7 @@ class DualRegression(BaseKernelMachine):
             X (2-D array) : data,shape = (N_samples,N_dim)
 
         Returns:
-            y (1-D array) : predicted value, shape = (N_samples,1) 
+            1-D array: predicted value, shape = (N_samples,1) 
 
         """ 
         gram_mat = np.zeros((self.X.shape[0],X.shape[0]))
@@ -142,7 +140,7 @@ class NadarayaWatson():
             X (2-D array) : data,shape = (N_samples,N_dim)
 
         Returns:
-            y (2-D array) : predicted value, shape = (N_samples,1) 
+            2-D array: predicted value, shape = (N_samples,1) 
 
         """ 
         y = np.zeros(X.shape[0])
@@ -160,7 +158,7 @@ class GaussianProcessRegression(BaseKernelMachine):
         kernel_func (function) : kernel function k(x,y) 
         gram_func (function) : function which make gram matrix 
         alpha,beta (float) : hyperparameter 
-        C_inv (2-D array) : 
+        C_inv (2-D array) : inverse of C
 
     """
     def __init__(self,alpha=1.0,beta=5.0,kernel="Linear",sigma=0.1,a=1.0,b=0.0,h=None,theta=1.0):
@@ -200,8 +198,8 @@ class GaussianProcessRegression(BaseKernelMachine):
             return_std (bool) : if True,also return std of predicted value 
 
         Returns:
-            y (2-D array) : predicted value, shape = (N_samples,1) 
-            std (2-D array) : std of predicted value, shape = (N_samples,1)
+            2-D array: predicted value, shape = (N_samples,1) 
+            2-D array: std of predicted value, shape = (N_samples,1)
 
         """ 
         gram_mat = np.zeros((self.X.shape[0],X.shape[0]))
@@ -288,9 +286,8 @@ class GaussianProcessClassifier(BaseKernelMachine,Classifier):
             return_prob (bool) : if True, return probability 
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
-            or if return_prob == True
-            y (1-D array) :  always return probability of belonging to class1 in each record 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting.
+                                    If return_prob == True, always return probability of belonging to class1 in each record 
 
         """
         gram_mat = np.zeros((self.X.shape[0],X.shape[0]))

@@ -1,10 +1,7 @@
 """Datasets
 
-RegressionDataGenerator 
-ClassificationDataGenerator2
-ClassificationDataGenerator3 
-load_iris 
-load_mnist 
+RegressionDataGenerator, ClassificationDataGenerator2, ClassificationDataGenerator3, load_iris, load_mnist 
+are implemented. 
 
 """
 
@@ -35,8 +32,8 @@ class RegressionDataGenerator():
             std (float) : std of gauss noise
 
         Returns:
-            X (2-D array) : explanatory variable,shape = (N_samples,1)
-            y (2-D array) : target variable, shape = (N_samples,1) 
+            2-D array: explanatory variable,shape = (N_samples,1)
+            2-D array: target variable, shape = (N_samples,1) 
 
         """ 
         X = np.random.rand(n)*(lower - upper) + upper
@@ -63,6 +60,8 @@ class ClassificationDataGenerator2():
         """Make data
 
         explanatory variable is expressed (x,y). 
+        if encoding = "onehot", returned target variable's shape = (N_samples,2)
+        if encoding = "target", returned target variable's shape = (N_samples)
 
         Args:
             n (int) : number of data
@@ -71,9 +70,7 @@ class ClassificationDataGenerator2():
             encoding (str) : "onehot" or "target"
 
         Returns:
-            X (2-D array) : explanatory variable.shape = (N_samples,2)
-            y (encoding = "onehot") (2-D array) : target variable,shape = (N_samples,2)
-            y (encoding = "target") (1-D array) : target variable,shape = (N_samples) 
+            2-D array: explanatory variable.shape = (N_samples,2) and y
 
         """ 
         X1 = np.random.rand(n)*(x_upper - x_lower) + x_lower
@@ -93,6 +90,8 @@ class ClassificationDataGenerator3():
     """ClassificationDataGenerator3 
 
     Create 2-D toy data for classification, which has 3-class.
+    if encoding = "onehot", returned target variable's shape = (N_samples,3)
+    if encoding = "target", returned target variable's shape = (N_samples)
 
     """
     def __init__(self,f1,f2):
@@ -121,9 +120,7 @@ class ClassificationDataGenerator3():
             encoding (str) : "onehot" or "target"
 
         Returns:
-            X (2-D array) : explanatory variable.shape = (N_samples,2)
-            y (encoding = "onehot") (2-D array) : target variable,shape = (N_samples,3)
-            y (encoding = "target") (1-D array) : target variable,shape = (N_samples) 
+            2-D array: explanatory variable.shape = (N_samples,2) and y
 
         """ 
         X1 = np.random.rand(n)*(x_upper - x_lower) + x_lower
@@ -150,8 +147,8 @@ def load_iris():
     """
 
     Returns:
-        X (2-D array): explanatary valiable 
-        y (1-D array): class 0,1,2
+        2-D array: explanatary valiable 
+        1-D array: class 0,1,2
         
     """
     dict = {
@@ -202,8 +199,8 @@ def load_mnist(label=np.arange(10),normalized=True):
         normalized (bool): if image is normalized or not
     
     Returns:
-        X (2-D array): image, shape = (N,28,28)
-        y (1-D array): target
+        2-D array: image, shape = (N,28,28)
+        1-D array: target
 
     """
 

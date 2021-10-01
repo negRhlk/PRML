@@ -1,11 +1,7 @@
 """Continuous Latent Variables 
 
-chapter12
-PCA
-ProbabilisticPCA
-ProbabilisticPCAbyEM
-FactorAnalysis
-KernelPCA
+This module is about chapter12. 
+PCA, ProbabilisticPCA, ProbabilisticPCAbyEM, FactorAnalysis, KernelPCA are implemented. 
 
 """
 
@@ -53,9 +49,9 @@ class PCA():
             return_importance (bool): return importance or not
             whitening (bool): if whitening or not
         
-        Retunrs:
-            X_proj (2-D array): shape = (N_samples,M), projected data
-            impotance_rate (float): how important X_proj is
+        Returns:
+            2-D array: shape = (N_samples,M), projected data
+            float: how important X_proj is
 
         """
         if whitening:
@@ -74,9 +70,9 @@ class PCA():
             return_importance (bool): return importance or not
             whitening (bool): if whitening or not
         
-        Retunrs:
-            X_proj (2-D array): shape = (N_samples,M), projected data
-            impotance_rate (float): how important X_proj is
+        Returns:
+            2-D array: shape = (N_samples,M), projected data
+            float: how important X_proj is
 
         """
         self.fit(X)
@@ -131,7 +127,7 @@ class ProbabilisticPCA():
             M (int): number of principal component, M is less than X.shape[1]
         
         Returns:
-            X_proj (2-D array): shape = (N_samples,M), projected data
+            2-D array: shape = (N_samples,M), projected data
 
         """
         if self.D == M:
@@ -154,7 +150,7 @@ class ProbabilisticPCA():
             M (int): number of principal component, M is less than X.shape[1]
         
         Returns:
-            X_proj (2-D array): shape = (N_samples,M), projected data
+            2-D array: shape = (N_samples,M), projected data
 
         """
         self.fit(X)
@@ -248,10 +244,11 @@ class ProbabilisticPCAbyEM():
             X (2-D array): shape = (N_samples,N_dim), data
 
         Returns:
-            X_proj (2-D array): shape = (N_samples,M), projected data
+            2-D array: shape = (N_samples,M), projected data
         
         Note:
             unlike other method you should choose M when you call `fit()`
+
         """
 
  
@@ -271,7 +268,7 @@ class ProbabilisticPCAbyEM():
             alpha_limit (float): if alpha is more than this, this component is removed
         
         Returns:
-            X_proj (2-D array): shape = (N_samples,M), projected data
+            2-D array: shape = (N_samples,M), projected data
 
         """
         self.fit(X,M,find_M,alpha_limit)
@@ -338,7 +335,7 @@ class FactorAnalysis():
             X (2-D array): shape = (N_samples,N_dim), data
 
         Returns:
-            X_proj (2-D array): shape = (N_samples,M), projected data
+            2-D array: shape = (N_samples,M), projected data
         
         """
  
@@ -354,7 +351,7 @@ class FactorAnalysis():
             M (int): number of principal component, M is less than X.shape[1]
 
         Returns:
-            X_proj (2-D array): shape = (N_samples,M), projected data
+            2-D array: shape = (N_samples,M), projected data
 
         """
         self.fit(X,M)
@@ -416,7 +413,7 @@ class KernelPCA(BaseKernelMachine):
             X (2-D array): shape = (N_samples,N_dim), data
 
         Returns:
-            X_proj (2-D array): shape = (N_samples,M), projected data
+            2-D array: shape = (N_samples,M), projected data
 
         """
         gram_mat = np.zeros((self.X.shape[0],X.shape[0]))
@@ -433,7 +430,7 @@ class KernelPCA(BaseKernelMachine):
             M (int): number of principal component, M is less than X.shape[1]
 
         Returns:
-            X_proj (2-D array): shape = (N_samples,M), projected data
+            2-D array: shape = (N_samples,M), projected data
 
         """
         self.fit(X)

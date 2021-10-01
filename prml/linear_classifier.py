@@ -1,14 +1,8 @@
 """Linear Classification Models 
 
-chapter4 
-LinearClassifier 
-Fisher1D
-Fisher
-Perceptron 
-GenerativeClassifier 
-LogisticRegression
-MultiClassLogisticRegression
-BayesianLogisticRegression
+This module is about chapter4.
+LinearClassifier, Fisher1D, Fisher, Perceptron, GenerativeClassifier, LogisticRegression, MultiClassLogisticRegression, BayesianLogisticRegression
+are implemented. 
 
 """
 
@@ -56,6 +50,7 @@ class LinearClassifier(Classifier):
 
     solve classification problem by minimizing least-squared-error. 
     this is not so good for classification problem. 
+
     """
 
     def __init__(self):
@@ -81,7 +76,7 @@ class LinearClassifier(Classifier):
             X (2-D array) : explanatory variable, shape = (N_samples,N_dims)
         
         Returns: 
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
 
         """
         one = np.ones((X.shape[0],1))
@@ -98,6 +93,7 @@ class Fisher1D(Classifier):
     """Fisher1D
 
     project onto the line 
+
     """
     def __init__(self):
         super(Fisher1D,self).__init__()
@@ -125,7 +121,7 @@ class Fisher1D(Classifier):
             X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
         
         Returns:
-            y (1-D array) : projection to 1D data
+            1-D array: projection to 1D data
 
         """
         return (X@self.weight).ravel()
@@ -138,7 +134,7 @@ class Fisher1D(Classifier):
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. should be 2-class data.  
 
         Returns:
-             y (1-D array) : projection to 1D data
+            1-D array: projection to 1D data
 
         """
         self.fit(X,y)
@@ -188,7 +184,7 @@ class Fisher(Classifier):
             X (2-D array) : explanatory variable, shape = (N_samples,N_dims) 
         
         Returns:
-            y (array) : projected data, shape = (N_samples,n_components)
+            array: projected data, shape = (N_samples,n_components)
 
         """
         return X@self.weight
@@ -201,7 +197,7 @@ class Fisher(Classifier):
             y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded.  
         
         Returns:
-            y (array) : projected data, shape = (N_samples,n_components)
+            array: projected data, shape = (N_samples,n_components)
 
         """
         self.fit(X,y)
@@ -258,7 +254,7 @@ class Perceptron(Classifier):
             X (2-D arrray) : shape = (N_samples,N_dims)
 
         Returns:
-            y_pred (1-D arrat) : shape = (N_samples) values is 1 or -1
+            1-D arrat: shape = (N_samples) values is 1 or -1
 
         """
         
@@ -272,7 +268,7 @@ class Perceptron(Classifier):
             X (2-D arrray) : shape = (N_samples,N_dims)
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
 
         """
         design_mat = np.vstack([self.phi(x) for x in X])
@@ -344,7 +340,7 @@ class GenerativeClassifier(Classifier):
             X (2-D array) : shape = (N_samples,N_dims)
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
 
         """
         
@@ -361,8 +357,8 @@ class GenerativeClassifier(Classifier):
             size (int) : number of data to be generated 
 
         Returns:
-            X (2-D array) : generated data, shape = (N_samples,N_dims)
-            y (2-D array) : generated data, onehotencoded, shape = (N_samples,2)
+            2-D array: generated data, shape = (N_samples,N_dims)
+            2-D array: generated data, onehotencoded, shape = (N_samples,2)
 
         """
         x = np.random.rand(size) 
@@ -465,11 +461,8 @@ class LogisticRegression(_logistic_regression_base):
             return_prob (bool) : if True, return probability 
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
-
-            or if return_prob == True
-
-            y (1-D array) :  always return probability of belonging to class1 in each record 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting.
+                                    If return_prob == True, always return probability of belonging to class1 in each record 
 
         """
         
@@ -496,9 +489,11 @@ class MultiClassLogisticRegression(_logistic_regression_base):
         mu (1-D array) : mean parameter 
         s (1-D array) : standard deviation parameter 
         deg (int) : max degree of polynomial features
+
     """
     def __init__(self,max_iter=30,threshold=1e-2,learning_rate=1e-2,basis_function="gauss",mu=None,s=None,deg=None):
         """
+
         Args:
             max_iter (int) : max iteration for parameter optimization
             threshold (float) : threshold for optimizint parameters 
@@ -507,6 +502,7 @@ class MultiClassLogisticRegression(_logistic_regression_base):
             mu (1-D array) : mean parameter 
             s (1-D array) : standard deviation parameter 
             deg (int) : max degree of polynomial features
+
         """
         super(MultiClassLogisticRegression,self).__init__(max_iter,threshold,basis_function,mu,s,deg)
         self.learning_rate = learning_rate
@@ -520,6 +516,7 @@ class MultiClassLogisticRegression(_logistic_regression_base):
         
         Note:
             optimizing parameters in gradient descent method 
+
         """
         y = self._label_to_onehot(y) 
         design_mat = self.make_design_mat(X) 
@@ -538,12 +535,11 @@ class MultiClassLogisticRegression(_logistic_regression_base):
         Args:
             X (2-D arrray) : shape = (N_samples,N_dims)
             return_prob (bool) : if True, return probability 
+
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting.
+                                    If return_prob == True, always return probability of belonging to class1 in each record 
 
-            or if return_prob == True
-
-            y (2-D array) :  always return probability of belonging to each class in each record 
         """
         
         design_mat = self.make_design_mat(X) 
@@ -629,11 +625,8 @@ class BayesianLogisticRegression(_logistic_regression_base):
             return_prob (bool) : if True, return probability 
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
-
-            or if return_prob == True
-
-            y (1-D array) :  always return probability of belonging to class1 in each record 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting.
+                                    If return_prob == True, always return probability of belonging to class1 in each record 
 
         """
         

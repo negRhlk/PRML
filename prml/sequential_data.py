@@ -1,11 +1,7 @@
 """sequential data 
 
-chapter13
-AR
-BaseHMM 
-GaussHMM 
-BernoulliHMM 
-LDS  
+This module is about chapter13. 
+AR, BaseHMM, GaussHMM, BernoulliHMM, LDS are implemented. 
 
 """
 
@@ -60,7 +56,7 @@ class AR():
             size (int): number of predict data from the lasta data of X 
         
         Returns:
-            pred (1-D array): shape = (size), predicted variables 
+            1-D array: shape = (size), predicted variables 
 
         """
         X = X[-self.p:]
@@ -181,7 +177,7 @@ class BaseHMM(ABC):
             size (int): number of predict data from the lasta data of X 
         
         Returns:
-            pred (2-D array): shape = (size,-1),predicted variables 
+            2-D array: shape = (size,-1),predicted variables 
 
         """
         pred = np.zeros((size,X.shape[1]))
@@ -199,7 +195,7 @@ class BaseHMM(ABC):
             X (2-D array): shape = (N,N_dim), time series data 
         
         Returns:
-            series (1-D array): shape = (N), series of most probable latent variables
+            1-D array: shape = (N), series of most probable latent variables
 
         """
 
@@ -228,7 +224,7 @@ class BaseHMM(ABC):
             gamma (2-D array): shape = (N,K), probablity of belonging to certain latent space
         
         Returns:
-            params (object): optimized param 
+            object: optimized param 
 
         """
         pass 
@@ -244,7 +240,7 @@ class BaseHMM(ABC):
             params (object): param 
         
         Returns:
-            pX (2-D array): shape = (N,K),probablity of X
+            2-D array: shape = (N,K),probablity of X
 
         """
         pass 
@@ -257,7 +253,7 @@ class BaseHMM(ABC):
             z (1-D array): shape = (K),latent variables 
 
         Returns:
-            Ex (1-D array): shape = (N_dim),expected value of X under the conditions of z
+            1-D array: shape = (N_dim),expected value of X under the conditions of z
 
         """
         pass 
@@ -286,7 +282,7 @@ class GaussHMM(BaseHMM):
             gamma (2-D array): shape = (N,K), probablity of belonging to certain latent space 
         
         Returns:
-            params (object): optimized param 
+            object: optimized param 
 
         """
         
@@ -310,7 +306,7 @@ class GaussHMM(BaseHMM):
             params (object): param 
         
         Returns:
-            pX (2-D array): shape = (N,K),probablity of X
+            2-D array: shape = (N,K),probablity of X
 
         """
         norm_const = 1/((2*np.pi)**X.shape[1]*np.linalg.det(params["sigma"]))**0.5
@@ -326,7 +322,7 @@ class GaussHMM(BaseHMM):
             z (1-D array): shape = (K),latent variables 
 
         Returns:
-            Ex (1-D array): shape = (N_dim),expected value of X under the conditions of z
+            1-D array: shape = (N_dim),expected value of X under the conditions of z
 
         """
         return np.dot(self.params["mu"].T,z)
@@ -355,7 +351,7 @@ class BernoulliHMM(BaseHMM):
             gamma (2-D array): shape = (N,K), probablity of belonging to certain latent space
         
         Returns:
-            params (object): optimized param 
+            object: optimized param 
 
         """
         mu = gamma.T@X/gamma.sum(axis = 0).reshape(-1,1)
@@ -373,7 +369,7 @@ class BernoulliHMM(BaseHMM):
             params (object): param 
         
         Returns:
-            pX (2-D array): shape = (N,K),probablity of X
+            2-D array: shape = (N,K),probablity of X
 
         """
         ohe = OnehotToLabel() 
@@ -387,7 +383,7 @@ class BernoulliHMM(BaseHMM):
             z (1-D array): shape = (K),latent variables 
 
         Returns:
-            Ex (1-D array): shape = (N_dim),expected value of X under the conditions of z
+            1-D array: shape = (N_dim),expected value of X under the conditions of z
 
         """
         return np.dot(self.params["mu"].T,z)
@@ -434,9 +430,9 @@ class LinearDynamicalSystem():
             P0 (2-D array): shape = (K,K)
         
         Returns:
-            mu (2-D array): shape = (N,K) 
-            V (3-D array): shape = (N,K,K) 
-            J (3-D array): shape = (N,K,K)
+            2-D array: mu,shape = (N,K) 
+            3-D array: V,shape = (N,K,K) 
+            3-D array: J,shape = (N,K,K)
 
         """
 
@@ -478,12 +474,12 @@ class LinearDynamicalSystem():
             J (3-D array): shape = (N,K,K)
         
         Returns:
-            A (2-D array): shape = (K,K), z_{n+1} = Az_n
-            Gamma (2-D array): shape = (K,K) 
-            C (2-D array): shape = (M,K)
-            Sigma (2-D array): shape = (M,M)
-            mu0 (1-D array): shape = (K) 
-            P0 (2-D array): shape = (K,K)
+            2-D array: A,shape = (K,K), z_{n+1} = Az_n
+            2-D array: Gamma,shape = (K,K) 
+            2-D array: C,shape = (M,K)
+            2-D array: Sigma,shape = (M,M)
+            1-D array: mu0,shape = (K) 
+            2-D array: O0,shape = (K,K)
 
         """
 
@@ -565,7 +561,7 @@ class LinearDynamicalSystem():
             size (int): number of predict data from the lasta data of X 
         
         Returns:
-            pred (2-D array): shape = (size,N_dim),predicted variables 
+            2-D array: shape = (size,N_dim),predicted variables 
 
         """
         N = X.shape[0] 

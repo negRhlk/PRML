@@ -1,7 +1,7 @@
 """Graphical Models
 
-chapter8
-IteratedConditionModes 
+This module is about chapter8.
+IteratedConditionModes are implemented.
 
 Todo:
     SumProduct
@@ -34,7 +34,7 @@ class IteratedConditionalModes():
             image (2-D array): value should be 0 or 1, which means monochrome image
         
         Returns:
-            denoised_image (2-D array): denoised image
+            2-D array: denoised image
 
         """
         image[image == 0] = -1 
@@ -70,7 +70,7 @@ class IteratedConditionalModes():
             n1,n2 (int): (n1.n2) is shape of image
         
         Returns:
-            idxs (array): index of adjacent cells of (i,j)
+            array: index of adjacent cells of (i,j)
 
         """
         idxs = [] 

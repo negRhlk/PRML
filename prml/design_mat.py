@@ -1,5 +1,4 @@
-"""
-Design Matrix 
+"""Design Matrix 
 
 Basis functions are
     - gauss
@@ -39,7 +38,7 @@ class DesignMat(metaclass=ABCMeta):
             x (1-D array) : data,shape = (N_dim) 
         
         Returns :
-            phi (1-D array) : data.shape = (N_featuredim)
+            1-D array: data.shape = (N_featuredim)
 
         """
         pass 
@@ -51,7 +50,7 @@ class DesignMat(metaclass=ABCMeta):
             X (2-D array) : data, shape = (N_samples,N_dim) 
 
         Returns : 
-            design_mat (2-D array) : design_mat, shape = (N_samples,N_featuredim)
+            2-D array: design_mat, shape = (N_samples,N_featuredim)
 
         """
         return np.vstack([self._basis_function(x) for x in X])
@@ -75,7 +74,7 @@ class GaussMat(DesignMat):
             x (1-D array) : data,shape = (N_dim) 
         
         Returns :
-            phi (1-D array) : data.shape = (N_featuredim)
+            1-D array: data.shape = (N_featuredim)
 
         """
         phi = np.exp(-(x.reshape(-1,1) - self.mu)/(2*self.s**2))
@@ -101,7 +100,7 @@ class SigmoidMat(DesignMat):
             x (1-D array) : data,shape = (N_dim) 
         
         Returns :
-            phi (1-D array) : data.shape = (N_featuredim)
+            1-D array: data.shape = (N_featuredim)
 
         """
         a = (x.reshape(-1,1) - self.mu)/self.s
@@ -132,7 +131,7 @@ class PolynomialMat(DesignMat):
             x (1-D array) : data,shape = (N_dim) 
         
         Returns :
-            phi (1-D array) : data.shape = (N_featuredim)
+            1-D array: data.shape = (N_featuredim)
 
         """
         phi = [np.array([1])]

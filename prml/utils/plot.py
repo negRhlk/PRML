@@ -1,8 +1,6 @@
 """plot
 
-plot_regressionr1D 
-plot_regression1D_with_std
-plot_classifier
+plot_regressionr1D, plot_regression1D_with_std, plot_classifier are implemented. 
 
 """
 

@@ -1,9 +1,7 @@
 """MIxuture Models 
 
-chapter9
-KMeans 
-GaussianMixture 
-BernoulliMixture 
+This module is about chapter9. 
+KMeans, GaussianMixture, BernoulliMixture are implemented. 
 
 """
 
@@ -36,8 +34,8 @@ class KMeans():
             X (2-D array): shape = (N_samples,N_dims)
         
         Returns:
-            cluster (1-D array): shape = (N_samples), index of group which a record belongs to
-            prototype (2-D array): shape = (K,N_dims), prototype vector
+            1-D array: shape = (N_samples), index of group which a record belongs to
+            2-D array: shape = (K,N_dims), prototype vector
 
         """
 
@@ -106,9 +104,9 @@ class GaussianMixture():
             init_sigma (3-D array): shape = (K,M,M), initial sigmas
         
         Returns:
-            pi (1-D array): shape = (K) 
-            mu (2-D array): shape = (K,M) 
-            sigma (3-D array): shape = (K,M,M)
+            1-D array: shape = (K) 
+            2-D array: shape = (K,M) 
+            3-D array: shape = (K,M,M)
 
         """
 
@@ -194,8 +192,8 @@ class BernoulliMixture():
             init_mu (2-D array): shape = (K,M), initial mus
 
         Returns:
-            pi (1-D array): shape = (K) 
-            mu (2-D array): shape = (K,M) 
+            1-D array: shape = (K) 
+            2-D array: shape = (K,M) 
 
         """
 

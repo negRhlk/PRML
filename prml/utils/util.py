@@ -1,10 +1,6 @@
 """util 
 
-sigmoid
-binary_cross_entropy
-softmax
-cross_entropy
-kappa 
+sigmoid, binary_cross_entropy, softmax, cross_entropy, kappa are implemented.
 
 """
 import numpy as np 
@@ -20,7 +16,7 @@ def _log(x):
         x (array)
 
     Returns:
-        log (array) : same shape as x, log equals np.log(x + EPS)
+        array: same shape as x, log equals np.log(x + EPS)
 
     """
     if np.any(x < 0):
@@ -36,7 +32,7 @@ def sigmoid(logit):
         logit (array) : data
 
     Returns:
-        prob (array) : same shape as logit 
+        array: same shape as logit 
 
     """
     prob = np.zeros_like(logit) 
@@ -58,7 +54,7 @@ def binary_cross_entropy(target,pred):
         pred (2-D array) : shape = (N_samples,2), value shoule be int (0,1)
     
     Returns:
-        loss (float) : mean of loss in records
+        float: mean of loss in records
 
     """
     if target.shape[1] == 1:
@@ -76,7 +72,7 @@ def softmax(x):
         x (2-D array) : shape = (N_samples,N_class) 
     
     Returns:
-        prob (2-D array) : shape = (N_samples,N_class) 
+        2-D array: shape = (N_samples,N_class) 
 
     """
     
@@ -95,7 +91,7 @@ def cross_entropy(target,pred):
         pred (2-D array) : shape = (N_samples,N_class) value shouled be in (0,1) 
     
     Returns:
-        loss (float) : mean of loss in records 
+        float: mean of loss in records 
 
     """
     loss = target*_log(pred) 
@@ -108,9 +104,10 @@ def kappa(sigma):
     this is used when approximating the inverse function of a probit function 
 
     Args:
-        sigma (array):  
+        sigma (array): sigma
+
     Returns:
-        kappa (array): 
+        array: 1/sqrt(1 + \pi*sigma/8)
 
     """
     return (1 + np.pi*sigma/8)**(-0.5)

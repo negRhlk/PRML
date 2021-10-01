@@ -23,6 +23,7 @@ class _Layer(metaclass=ABCMeta):
     """_Layer
 
     abstract class for layers 
+
     """
     def __init__(self): 
         self.initialize = False 
@@ -36,6 +37,7 @@ class _Layer(metaclass=ABCMeta):
     @abstractclassmethod
     def backward(self,loss):
         pass 
+
 
 class Dense(_Layer):
     """Dense layer 
@@ -64,7 +66,7 @@ class Dense(_Layer):
             X (2-D array) : data, shape is (N_samples,N_dims)
         
         Returns:
-            X (2-D array) : data, shape is (N_samples,output_size)
+            2-D array: data, shape is (N_samples,output_size)
 
         """
         self.X = X
@@ -82,7 +84,7 @@ class Dense(_Layer):
             loss (2-D array) : loss, shape is  (N_samples,output_shape), N_samples equals X.shape[0] at the last time forward() was called. 
         
         Returns:
-            dX (2-D array) : the last layer's loss, shape is (N_samples,N_dims) 
+            2-D array: dX, the last layer's loss, shape is (N_samples,N_dims) 
 
         """
         dX = np.dot(loss,self.W.T)
@@ -92,15 +94,19 @@ class Dense(_Layer):
         self.b -= self.learning_rate*db
         return dX
 
+
 class _ActivationLayer(metaclass=ABCMeta):
     def __init__(self):
         pass 
+
     @abstractclassmethod
     def forward(self,X):
         pass 
+
     @abstractclassmethod
     def backward(self,loss):
         pass 
+
 
 class Tanh(_ActivationLayer):
     """Tanh Layer
@@ -110,6 +116,7 @@ class Tanh(_ActivationLayer):
     def __init__(self):
         super(Tanh,self).__init__()
         self.X = None
+
     def forward(self,X):
         """forward
 
@@ -117,7 +124,7 @@ class Tanh(_ActivationLayer):
             X (2-D array) : data,shape is (N_samples,N_dims) 
         
         Returns:
-            relu (2-D array) : Tanh(X)
+            2-D array: Tanh(X)
 
         """
         self.X = X
@@ -127,6 +134,7 @@ class Tanh(_ActivationLayer):
         Y[plus] = (1 - np.exp(-2*X[plus]))/(1 + np.exp(-2*X[plus]))
         Y[minus] = (np.exp(2*X[minus]) - 1)/(np.exp(2*X[minus]) + 1) 
         return Y
+
     def backward(self,loss):
         """backward 
 
@@ -145,6 +153,7 @@ class Tanh(_ActivationLayer):
         dX = loss*np.square(tmp) 
         return dX
     
+
 class Relu(_ActivationLayer):
     """Relu Layer 
 
@@ -162,11 +171,12 @@ class Relu(_ActivationLayer):
             X (2-D array) : data,shape is (N_samples,N_dims) 
         
         Returns:
-            relu (2-D array) : Relu(X)
+            2-D array: Relu(X)
 
         """
         self.X = X
         return np.where(X > 0,X,0)
+
     def backward(self,loss):
         """backward 
 
@@ -174,12 +184,13 @@ class Relu(_ActivationLayer):
             loss (2-D array) : loss, shape is  (N_samples,input_shape), N_samples equals X.shape[0] at the last time forward() was called. 
         
         Returns:
-            dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+            2-D array: the last layer's loss, shape is (N_samples,input_shape) 
 
         """
         dX = np.zeros_like(self.X)
         dX[self.X >= 0] = 1
         return loss*dX
+
 
 class _LossLayer(metaclass=ABCMeta):
     def __init__(self):
@@ -190,6 +201,7 @@ class _LossLayer(metaclass=ABCMeta):
     @abstractclassmethod
     def backward(self,loss):
         pass 
+
 
 class MeanSquaredError(_LossLayer):
     """MeanSquaredError
@@ -209,7 +221,7 @@ class MeanSquaredError(_LossLayer):
             target (array) : ground truth 
         
         Return:
-            loss (float) : mean squared loss 
+            float: mean squared loss 
 
         """
         self.predict = predict
@@ -222,7 +234,7 @@ class MeanSquaredError(_LossLayer):
             loss (2-D array) : 1 
 
         Returns:
-            dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+            2-D array: the last layer's loss, shape is (N_samples,input_shape) 
 
         Note:
             loss layer is always receive 1 when backward  
@@ -231,6 +243,7 @@ class MeanSquaredError(_LossLayer):
         shape = self.target.shape[0]
         dX = loss*(self.predict - self.target)/shape
         return dX
+
 
 class SigmoidCrossEntropy(_LossLayer): 
     """sigmoid activation function and cross entropy loss 
@@ -251,7 +264,7 @@ class SigmoidCrossEntropy(_LossLayer):
             target (2-D array) : data, shape is (N_samples,2) 
         
         Returns:
-            loss (float) : cross entropy of sigmoid(X) and target 
+            float: cross entropy of sigmoid(X) and target 
 
         """
         self.predict = softmax(X) 
@@ -265,7 +278,7 @@ class SigmoidCrossEntropy(_LossLayer):
             loss (2-D array) : 1 
 
         Returns:
-            dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+            2-D array: the last layer's loss, shape is (N_samples,input_shape) 
 
         Note:
             loss layer is always receive 1 when backward  
@@ -273,6 +286,7 @@ class SigmoidCrossEntropy(_LossLayer):
         """
         shape = self.target.shape[0] 
         return loss*(self.predict - self.target)/shape 
+
 
 class SoftmaxCrossEntropy(_LossLayer): 
     """Softmax Cross Entropy 
@@ -294,7 +308,7 @@ class SoftmaxCrossEntropy(_LossLayer):
             target (2-D array) : ground truth, shape = (N_samples,N_class)
 
         Return:
-            loss (float) : cross entropy loss 
+            float: cross entropy loss 
 
         """
         self.predict = softmax(X)  
@@ -308,7 +322,7 @@ class SoftmaxCrossEntropy(_LossLayer):
             loss (2-D array) : 1 
 
         Returns:
-            dX (2-D array) : the last layer's loss, shape is (N_samples,input_shape) 
+            2-D array: the last layer's loss, shape is (N_samples,input_shape) 
 
         Note:
             loss layer is always receive 1 when backward  

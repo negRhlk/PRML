@@ -1,7 +1,6 @@
 """Encoder 
 
-OnehotToLabel 
-LabeltoOnehot 
+OnehotToLabel, LabeltoOnehot are implemented.
 
 """
 
@@ -33,7 +32,7 @@ class OnehotToLabel():
             X (2-D array) : onehot-encoded data, shape = (N_samples,N_class) 
 
         Returns:
-            y (1-D array) : label-encoded data, shape = (N_samples)
+            1-D array: label-encoded data, shape = (N_samples)
 
         """
         y = np.zeros(X.shape[0])
@@ -48,7 +47,7 @@ class OnehotToLabel():
             X (2-D array) : onehot-encoded data, shape = (N_samples,N_class) 
 
         Returns:
-            y (1-D array) : label-encoded data, shape = (N_samples)
+            1-D array: label-encoded data, shape = (N_samples)
 
         """
         self.fit(X)
@@ -61,7 +60,7 @@ class OnehotToLabel():
             y (1-D array) : label-encoded data, shape = (N_samples) 
 
         Returns:
-            X (2-D array) : onehot-encoded data, shape = (N_samples,N_class)
+            2-D array: onehot-encoded data, shape = (N_samples,N_class)
 
         """
         X = np.zeros((y.shape[0],self.K)) 
@@ -98,7 +97,7 @@ class LabelToOnehot():
             y (1-D array) : label-encoded data, shape = (N_samples) 
 
         Returns:
-            X (2-D array) : onehot-encoded data, shape = (N_samples,N_class)
+            2-D array: onehot-encoded data, shape = (N_samples,N_class)
 
         """
         X = np.zeros((y.shape[0],self.K)) 
@@ -113,7 +112,7 @@ class LabelToOnehot():
             y (1-D array) : label-encoded data, shape = (N_samples) 
 
         Returns:
-            X (2-D array) : onehot-encoded data, shape = (N_samples,N_class)
+            2-D array: onehot-encoded data, shape = (N_samples,N_class)
 
         """
         self.fit(y)
@@ -126,7 +125,7 @@ class LabelToOnehot():
             X (2-D array) : onehot-encoded data, shape = (N_samples,N_class) 
 
         Returns:
-            y (1-D array) : label-encoded data, shape = (N_samples)
+            1-D array: label-encoded data, shape = (N_samples)
             
         """
         y = np.zeros(X.shape[0])

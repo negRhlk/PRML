@@ -1,12 +1,6 @@
 """Kernel function 
 
-LinearKernel 
-GaussianKernel 
-SigmoidKernel
-RBFKernel 
-ExponentialKernel
-
-GramMatrix
+LinearKernel, GaussianKernel, SigmoidKerne, RBFKernel, ExponentialKernel, GramMatrix are implemented
 
 """
 
@@ -25,7 +19,7 @@ class BaseKernel(ABC):
             x,y (1-D array) : calculate k(x,y)
         
         Returns:    
-            k (float) : k(x,y) 
+            float: k(x,y) 
 
         """
         pass 
@@ -46,7 +40,7 @@ class LinearKernel(BaseKernel):
             x,y (1-D array) : calculate k(x,y)
         
         Returns:    
-            k (float) : k(x,y) = x^Ty
+            float: k(x,y) = x^Ty
 
         """
         return np.dot(x,y)
@@ -74,7 +68,7 @@ class GaussianKernel(BaseKernel):
             x,y (1-D array) : calculate k(x,y)
         
         Returns:    
-            k (float) : k(x,y) = exp(-|x-y|^2/2sigma^2)
+            float: k(x,y) = exp(-|x-y|^2/2sigma^2)
 
         """
         return np.exp(-np.dot(x-y,x-y)/(2*self.sigma**2))
@@ -103,7 +97,7 @@ class SigmoidKernel(BaseKernel):
             x,y (1-D array) : calculate k(x,y)
         
         Returns:    
-            k (float) : k(x,y) = tanh(ax^Ty + b)
+            float: k(x,y) = tanh(ax^Ty + b)
 
         """
         return np.tanh(self.a*np.dot(x,y) + self.b)
@@ -131,7 +125,7 @@ class RBFKernel(BaseKernel):
             x,y (1-D array) : calculate k(x,y)
         
         Returns:    
-            k (float) : k(x,y) = h(|x - y|) 
+            float: k(x,y) = h(|x - y|) 
 
         """
         return self.h(np.dot(x-y,x-y)**0.5)
@@ -159,7 +153,7 @@ class ExponentialKernel(BaseKernel):
             x,y (1-D array) : calculate k(x,y)
         
         Returns:    
-            k (float) : k(x,y) = exp(-theta|x - y|)
+            float: k(x,y) = exp(-theta|x - y|)
 
         """
         return np.exp(-self.theta*np.dot(x-y,x-y)**0.5)
@@ -215,7 +209,7 @@ class GramMatrix():
             X (2-D array) : shape = (N_samples,N_dims)
         
         Returns:
-            G (2-D array) : shape = (N_samples,N_samples) 
+            2-D array: Gram matrix, shape = (N_samples,N_samples) 
         
         Note:
             time complexity is O(N_samples^2*N_dims)

@@ -1,14 +1,8 @@
 """Probability Distribution 
 
-chapter2 
-Binary
-Multi
-Gaussian1D
-student's t-distribution 
-Histgram
-Parzen
-KNearestNeighbor
-KNeighborClassifier
+This module is about chapter2. 
+Binary, Multi, Gaussian1D, student's t-distribution, Histgram, Parzen, KNearestNeighbor, KNeighborClassifier
+are implemented. 
 
 """
 

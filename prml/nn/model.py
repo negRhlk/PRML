@@ -1,9 +1,7 @@
 """Model 
 
-chapter5
-_Model
-Regressor
-Classifier
+This package is about chapter5. 
+Regressor,Classifier are implemented
 
 Todo:
     caluculate hessian 
@@ -185,7 +183,7 @@ class ClassifierNN(_Model):
             return_prib (bool) : if True, return probabilities 
         
         Returns:
-            softmax (2-D array) : classification 
+            2-D array: classification 
 
         """
         feature = super(ClassifierNN,self).predict(X)

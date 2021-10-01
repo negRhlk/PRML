@@ -1,9 +1,7 @@
 """Approximate Inference 
 
-chapter10
-VariationalGauss1D
-VariationalGaussianMixture
-VariationalLogisticRegression
+This module is about chapter10. 
+VariationalGauss1D, VariationalGaussianMixture, VariationalLogisticRegression are implemented. 
 
 Todo:
     EP_for_noisy_data
@@ -224,7 +222,7 @@ class VariationalGaussianMixture():
             X (2-D array): shape = (N_samples,N_dims) 
         
         Returns:
-            prob (1-D array): length = N_samples, which is the probability of predictive density
+            1-D array: length = N_samples, which is the probability of predictive density
 
         """
         D = X.shape[1]
@@ -330,7 +328,7 @@ class VariationalLogisticRegression(_logistic_regression_base):
             design_mat (2-D array): design_mat
         
         Returns:
-            new_xi (1-D array): xi 
+            1-D array: xi 
 
         """
 
@@ -351,11 +349,8 @@ class VariationalLogisticRegression(_logistic_regression_base):
             return_prob (bool) : if True, return probability 
 
         Returns:
-            y (1-D array or 2-D array) : if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting. 
-
-            or if return_prob == True
-
-            y (1-D array) :  always return probability of belonging to class1 in each record 
+            1-D array or 2-D array: if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded. This depends on parameter y when fitting.
+                                    If return_prob == True, always return probability of belonging to class1 in each record 
 
         """
         design_mat = self.make_design_mat(X)
