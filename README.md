@@ -1,6 +1,6 @@
 # PRML
 
-In this repository, various machine learning algorithms in 「Pattern Recognition and Machine Learning」without using machine learning packages such as `scikit-learn`. 
+In this repository, various machine learning algorithms in 「Pattern Recognition and Machine Learning」are implemented without using machine learning packages such as `scikit-learn`. 
 
 All the algorithms are implemeted in the directory `prml`. In `short_notebook` directory, I use `prml` package (which I make myself). This notebooks are short-version, so 
 this is useful when you want to see how these algorithms work. <br>
