@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>prml.nn package &mdash; prml 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="prml.utils package" href="prml.utils.html" />
+    <link rel="prev" title="prml package" href="prml.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> prml
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="prml.html">prml package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="prml.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">prml.nn package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-prml.nn.layers">prml.nn.layers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-prml.nn.model">prml.nn.model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-prml.nn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="prml.utils.html">prml.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.approximate_inference">prml.approximate_inference module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.combining_models">prml.combining_models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.continuous_latent_variables">prml.continuous_latent_variables module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.design_mat">prml.design_mat module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.graphical_models">prml.graphical_models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.kernel_func">prml.kernel_func module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.kernel_method">prml.kernel_method module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.linear_classifier">prml.linear_classifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.linear_regression">prml.linear_regression module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.mixture_models">prml.mixture_models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.probability_distribution">prml.probability_distribution module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.sampling_methods">prml.sampling_methods module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.sequential_data">prml.sequential_data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.sparse_kernel_machines">prml.sparse_kernel_machines module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">prml</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="prml.html">prml package</a> &raquo;</li>
+      <li>prml.nn package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/prml.nn.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="prml-nn-package">
+<h1>prml.nn package<a class="headerlink" href="#prml-nn-package" title="Permalink to this headline"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-prml.nn.layers">
+<span id="prml-nn-layers-module"></span><h2>prml.nn.layers module<a class="headerlink" href="#module-prml.nn.layers" title="Permalink to this headline"></a></h2>
+<p>Layers</p>
+<p>Dense</p>
+<dl class="simple">
+<dt>Activation Layers:</dt><dd><p>Tanh
+Relu</p>
+</dd>
+<dt>Loss Layers:</dt><dd><p>MeanSquaerdErroor
+SigmoidCrossEntropy
+SoftmaxCrossEntropy</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.nn.layers.Dense">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.nn.layers.</span></span><span class="sig-name descname"><span class="pre">Dense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.Dense" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">prml.nn.layers._Layer</span></code></p>
+<p>Dense layer</p>
+<p>Fully Conncted layer or Affine Layer</p>
+<blockquote>
+<div><p>y = Wx + b</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Attributs:</dt><dd><p>output_size (int) : output data shape is (N_samples,output_shape)
+W,b (array) : parameter for this layer
+X (2-D array) : data which is used the last time data was forward</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.Dense.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.Dense.backward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss</strong> (<em>2-D array</em>) – loss, shape is  (N_samples,output_shape), N_samples equals X.shape[0] at the last time forward() was called.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dX, the last layer’s loss, shape is (N_samples,N_dims)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.Dense.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.Dense.forward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>2-D array</em>) – data, shape is (N_samples,N_dims)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>data, shape is (N_samples,output_size)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.nn.layers.MeanSquaredError">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.nn.layers.</span></span><span class="sig-name descname"><span class="pre">MeanSquaredError</span></span><a class="headerlink" href="#prml.nn.layers.MeanSquaredError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">prml.nn.layers._LossLayer</span></code></p>
+<p>loss layer  used in regression problems</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.MeanSquaredError.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.MeanSquaredError.backward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss</strong> (<em>2-D array</em>) – 1</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the last layer’s loss, shape is (N_samples,input_shape)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>loss layer is always receive 1 when backward</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.MeanSquaredError.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.MeanSquaredError.forward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>predict</strong> (<em>array</em>) – predict values</p></li>
+<li><p><strong>target</strong> (<em>array</em>) – ground truth</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mean squared loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.nn.layers.Relu">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.nn.layers.</span></span><span class="sig-name descname"><span class="pre">Relu</span></span><a class="headerlink" href="#prml.nn.layers.Relu" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">prml.nn.layers._ActivationLayer</span></code></p>
+<p>Relu Layer</p>
+<p>Relu is non-differentiable at x = 0. Derivative value at x = 0 is define as 1 in this layer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.Relu.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.Relu.backward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss</strong> (<em>2-D array</em>) – loss, shape is  (N_samples,input_shape), N_samples equals X.shape[0] at the last time forward() was called.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the last layer’s loss, shape is (N_samples,input_shape)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.Relu.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.Relu.forward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>2-D array</em>) – data,shape is (N_samples,N_dims)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Relu(X)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.nn.layers.SigmoidCrossEntropy">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.nn.layers.</span></span><span class="sig-name descname"><span class="pre">SigmoidCrossEntropy</span></span><a class="headerlink" href="#prml.nn.layers.SigmoidCrossEntropy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">prml.nn.layers._LossLayer</span></code></p>
+<p>sigmoid activation function and cross entropy loss</p>
+<p>this layer is sigmoid layer which has binary cross entropy loss</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.SigmoidCrossEntropy.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.SigmoidCrossEntropy.backward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss</strong> (<em>2-D array</em>) – 1</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the last layer’s loss, shape is (N_samples,input_shape)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>loss layer is always receive 1 when backward</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.SigmoidCrossEntropy.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.SigmoidCrossEntropy.forward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>2-D array</em>) – data,shape is (N_samples,2)</p></li>
+<li><p><strong>target</strong> (<em>2-D array</em>) – data, shape is (N_samples,2)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>cross entropy of sigmoid(X) and target</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.nn.layers.SoftmaxCrossEntropy">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.nn.layers.</span></span><span class="sig-name descname"><span class="pre">SoftmaxCrossEntropy</span></span><a class="headerlink" href="#prml.nn.layers.SoftmaxCrossEntropy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">prml.nn.layers._LossLayer</span></code></p>
+<p>Softmax Cross Entropy</p>
+<p>this layer is softmax layer which has cross entropy loss</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.SoftmaxCrossEntropy.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.SoftmaxCrossEntropy.backward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss</strong> (<em>2-D array</em>) – 1</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the last layer’s loss, shape is (N_samples,input_shape)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>loss layer is always receive 1 when backward</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.SoftmaxCrossEntropy.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.SoftmaxCrossEntropy.forward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>2-D array</em>) – data, shape = (N_samples,N_class)</p></li>
+<li><p><strong>target</strong> (<em>2-D array</em>) – ground truth, shape = (N_samples,N_class)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>cross entropy loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.nn.layers.Tanh">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.nn.layers.</span></span><span class="sig-name descname"><span class="pre">Tanh</span></span><a class="headerlink" href="#prml.nn.layers.Tanh" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">prml.nn.layers._ActivationLayer</span></code></p>
+<p>Tanh Layer</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.Tanh.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.Tanh.backward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>loss</strong> (<em>2-D array</em>) – loss, shape is  (N_samples,input_shape), N_samples equals X.shape[0] at the last time forward() was called.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the last layer’s loss, shape is (N_samples,input_shape)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dX (2-D array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.layers.Tanh.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.layers.Tanh.forward" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>2-D array</em>) – data,shape is (N_samples,N_dims)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tanh(X)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-prml.nn.model">
+<span id="prml-nn-model-module"></span><h2>prml.nn.model module<a class="headerlink" href="#module-prml.nn.model" title="Permalink to this headline"></a></h2>
+<p>Model</p>
+<p>This package is about chapter5.
+Regressor,Classifier are implemented</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.nn.model.ClassifierNN">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.nn.model.</span></span><span class="sig-name descname"><span class="pre">ClassifierNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.model.ClassifierNN" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">prml.nn.model._Model</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.model.ClassifierNN.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'GradientDescent'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.model.ClassifierNN.fit" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>2-D array</em>) – data, shape = (N_samples,N_dims)</p></li>
+<li><p><strong>y</strong> (<em>1-D array</em><em> or </em><em>2-D array</em>) – if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded.</p></li>
+<li><p><strong>loss</strong> (<em>loss-layer</em>) – layer which inherits _LossLayer</p></li>
+<li><p><strong>optimizer</strong> (<em>str</em>) – “GradientDescent” or “SGD”</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.nn.model.ClassifierNN.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.model.ClassifierNN.predict" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>2-D array</em>) – data shape = (N_samples,N_dims)</p></li>
+<li><p><strong>return_prib</strong> (<em>bool</em>) – if True, return probabilities</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>classification</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.nn.model.RegressorNN">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.nn.model.</span></span><span class="sig-name descname"><span class="pre">RegressorNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.nn.model.RegressorNN" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">prml.nn.model._Model</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-prml.nn">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-prml.nn" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="prml.html" class="btn btn-neutral float-left" title="prml package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="prml.utils.html" class="btn btn-neutral float-right" title="prml.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, hedwig100.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

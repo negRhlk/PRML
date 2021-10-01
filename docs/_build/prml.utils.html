@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>prml.utils package &mdash; prml 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="prml.nn package" href="prml.nn.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> prml
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="prml.html">prml package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="prml.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="prml.nn.html">prml.nn package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">prml.utils package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-prml.utils.datasets">prml.utils.datasets module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-prml.utils.encoder">prml.utils.encoder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-prml.utils.plot">prml.utils.plot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-prml.utils.util">prml.utils.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-prml.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.approximate_inference">prml.approximate_inference module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.combining_models">prml.combining_models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.continuous_latent_variables">prml.continuous_latent_variables module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.design_mat">prml.design_mat module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.graphical_models">prml.graphical_models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.kernel_func">prml.kernel_func module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.kernel_method">prml.kernel_method module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.linear_classifier">prml.linear_classifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.linear_regression">prml.linear_regression module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.mixture_models">prml.mixture_models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.probability_distribution">prml.probability_distribution module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.sampling_methods">prml.sampling_methods module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.sequential_data">prml.sequential_data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml.sparse_kernel_machines">prml.sparse_kernel_machines module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prml.html#module-prml">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">prml</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="prml.html">prml package</a> &raquo;</li>
+      <li>prml.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/prml.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="prml-utils-package">
+<h1>prml.utils package<a class="headerlink" href="#prml-utils-package" title="Permalink to this headline"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-prml.utils.datasets">
+<span id="prml-utils-datasets-module"></span><h2>prml.utils.datasets module<a class="headerlink" href="#module-prml.utils.datasets" title="Permalink to this headline"></a></h2>
+<p>Datasets</p>
+<p>RegressionDataGenerator, ClassificationDataGenerator2, ClassificationDataGenerator3, load_iris, load_mnist
+are implemented.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.utils.datasets.ClassificationDataGenerator2">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.utils.datasets.</span></span><span class="sig-name descname"><span class="pre">ClassificationDataGenerator2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.datasets.ClassificationDataGenerator2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Create 2-D toy data for classification, which has 2-class.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.utils.datasets.ClassificationDataGenerator3">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.utils.datasets.</span></span><span class="sig-name descname"><span class="pre">ClassificationDataGenerator3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.datasets.ClassificationDataGenerator3" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Create 2-D toy data for classification, which has 3-class.
+if encoding = “onehot”, returned target variable’s shape = (N_samples,3)
+if encoding = “target”, returned target variable’s shape = (N_samples)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.utils.datasets.RegressionDataGenerator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.utils.datasets.</span></span><span class="sig-name descname"><span class="pre">RegressionDataGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.datasets.RegressionDataGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Create 1-D toy data for regression</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.datasets.load_iris">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.datasets.</span></span><span class="sig-name descname"><span class="pre">load_iris</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.datasets.load_iris" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>explanatary valiable
+1-D array: class 0,1,2</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.datasets.load_mnist">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.datasets.</span></span><span class="sig-name descname"><span class="pre">load_mnist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0,</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">7,</span> <span class="pre">8,</span> <span class="pre">9])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.datasets.load_mnist" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>1-D array</em>) – label of the datayou want to get</p></li>
+<li><p><strong>normalized</strong> (<em>bool</em>) – if image is normalized or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>image, shape = (N,28,28)
+1-D array: target</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-prml.utils.encoder">
+<span id="prml-utils-encoder-module"></span><h2>prml.utils.encoder module<a class="headerlink" href="#module-prml.utils.encoder" title="Permalink to this headline"></a></h2>
+<p>Encoder</p>
+<p>OnehotToLabel, LabeltoOnehot are implemented.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.utils.encoder.LabelToOnehot">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.utils.encoder.</span></span><span class="sig-name descname"><span class="pre">LabelToOnehot</span></span><a class="headerlink" href="#prml.utils.encoder.LabelToOnehot" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Transform label-encoded data to onehot-encoded data</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="prml.utils.encoder.LabelToOnehot.K">
+<span class="sig-name descname"><span class="pre">K</span></span><a class="headerlink" href="#prml.utils.encoder.LabelToOnehot.K" title="Permalink to this definition"></a></dt>
+<dd><p>number of class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="prml.utils.encoder.LabelToOnehot.data_group">
+<span class="sig-name descname"><span class="pre">data_group</span></span><a class="headerlink" href="#prml.utils.encoder.LabelToOnehot.data_group" title="Permalink to this definition"></a></dt>
+<dd><p>data which is labeled</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>1-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.utils.encoder.LabelToOnehot.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.encoder.LabelToOnehot.fit" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>1-D array</em>) – label-encoded data, shape = (N_samples)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.utils.encoder.LabelToOnehot.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.encoder.LabelToOnehot.fit_transform" title="Permalink to this definition"></a></dt>
+<dd><p>fit and transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>1-D array</em>) – label-encoded data, shape = (N_samples)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>onehot-encoded data, shape = (N_samples,N_class)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.utils.encoder.LabelToOnehot.inverse">
+<span class="sig-name descname"><span class="pre">inverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.encoder.LabelToOnehot.inverse" title="Permalink to this definition"></a></dt>
+<dd><p>inverse transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>2-D array</em>) – onehot-encoded data, shape = (N_samples,N_class)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>label-encoded data, shape = (N_samples)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>1-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.utils.encoder.LabelToOnehot.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.encoder.LabelToOnehot.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>1-D array</em>) – label-encoded data, shape = (N_samples)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>onehot-encoded data, shape = (N_samples,N_class)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="prml.utils.encoder.OnehotToLabel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">prml.utils.encoder.</span></span><span class="sig-name descname"><span class="pre">OnehotToLabel</span></span><a class="headerlink" href="#prml.utils.encoder.OnehotToLabel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Transform onehot-encoded data to label-encoded data</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="prml.utils.encoder.OnehotToLabel.K">
+<span class="sig-name descname"><span class="pre">K</span></span><a class="headerlink" href="#prml.utils.encoder.OnehotToLabel.K" title="Permalink to this definition"></a></dt>
+<dd><p>number of class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.utils.encoder.OnehotToLabel.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.encoder.OnehotToLabel.fit" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>2-D array</em>) – onehot-encoded data, shape = (N_samples,N_class)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.utils.encoder.OnehotToLabel.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.encoder.OnehotToLabel.fit_transform" title="Permalink to this definition"></a></dt>
+<dd><p>fit and transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>2-D array</em>) – onehot-encoded data, shape = (N_samples,N_class)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>label-encoded data, shape = (N_samples)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>1-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.utils.encoder.OnehotToLabel.inverse">
+<span class="sig-name descname"><span class="pre">inverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.encoder.OnehotToLabel.inverse" title="Permalink to this definition"></a></dt>
+<dd><p>inverse transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>1-D array</em>) – label-encoded data, shape = (N_samples)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>onehot-encoded data, shape = (N_samples,N_class)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="prml.utils.encoder.OnehotToLabel.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.encoder.OnehotToLabel.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>2-D array</em>) – onehot-encoded data, shape = (N_samples,N_class)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>label-encoded data, shape = (N_samples)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>1-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-prml.utils.plot">
+<span id="prml-utils-plot-module"></span><h2>prml.utils.plot module<a class="headerlink" href="#module-prml.utils.plot" title="Permalink to this headline"></a></h2>
+<p>plot</p>
+<p>plot_regressionr1D, plot_regression1D_with_std, plot_classifier are implemented.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.plot.plot_classifier">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_classifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_tr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_tr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.plot.plot_classifier" title="Permalink to this definition"></a></dt>
+<dd><p>plot classifier</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_tr</strong> (<em>2-D array</em>) – training data</p></li>
+<li><p><strong>y</strong> (<em>1-D array</em><em> or </em><em>2-D array</em>) – if 1-D array, y should be label-encoded, but 2-D arrray, y should be one-hot-encoded</p></li>
+<li><p><strong>classifier</strong> (<em>object</em>) – trained classifier</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – title of the plot</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.plot.plot_regression1D">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_regression1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_tr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_tr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.plot.plot_regression1D" title="Permalink to this definition"></a></dt>
+<dd><p>plot regressor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_tr</strong> (<em>1-D array</em>) – training data,explanatory variable</p></li>
+<li><p><strong>y_tr</strong> (<em>1-D array</em>) – training data,target variable</p></li>
+<li><p><strong>regressor</strong> (<em>object</em>) – trained regressor model which must have “predict” method</p></li>
+<li><p><strong>title</strong> (<em>string</em>) – title of the plot</p></li>
+<li><p><strong>f</strong> (<em>function</em>) – regression function</p></li>
+<li><p><strong>lower</strong> (<em>float</em>) – lower &lt;= x &lt;= upper</p></li>
+<li><p><strong>upper</strong> (<em>float</em>) – lower &lt;= x &lt;= upper</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.plot.plot_regression1D_with_std">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_regression1D_with_std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_tr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_tr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.plot.plot_regression1D_with_std" title="Permalink to this definition"></a></dt>
+<dd><p>plot regressor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_tr</strong> (<em>1-D array</em>) – training data,explanatory variable</p></li>
+<li><p><strong>y_tr</strong> (<em>1-D array</em>) – training data,target variable</p></li>
+<li><p><strong>regressor</strong> (<em>object</em>) – trained regressor model which must have “predict” method which should have ‘return_std = True’ as parameter</p></li>
+<li><p><strong>title</strong> (<em>string</em>) – title of the plot</p></li>
+<li><p><strong>f</strong> (<em>function</em>) – regression function</p></li>
+<li><p><strong>lower</strong> (<em>float</em>) – lower &lt;= x &lt;= upper</p></li>
+<li><p><strong>upper</strong> (<em>float</em>) – lower &lt;= x &lt;= upper</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-prml.utils.util">
+<span id="prml-utils-util-module"></span><h2>prml.utils.util module<a class="headerlink" href="#module-prml.utils.util" title="Permalink to this headline"></a></h2>
+<p>util</p>
+<p>sigmoid, binary_cross_entropy, softmax, cross_entropy, kappa are implemented.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.util.binary_cross_entropy">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.util.</span></span><span class="sig-name descname"><span class="pre">binary_cross_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.util.binary_cross_entropy" title="Permalink to this definition"></a></dt>
+<dd><p>binary cross entropy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> (<em>2-D array</em>) – shape = (N_samples,1), value should be 0 or 1</p></li>
+<li><p><strong>pred</strong> (<em>2-D array</em>) – shape = (N_samples,1), value shoule be in (0,1)</p></li>
+<li><p><strong>or</strong> – </p></li>
+<li><p><strong>target</strong> – shape = (N_samples,2), onehotencoding</p></li>
+<li><p><strong>pred</strong> – shape = (N_samples,2), value shoule be int (0,1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mean of loss in records</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.util.cross_entropy">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.util.</span></span><span class="sig-name descname"><span class="pre">cross_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.util.cross_entropy" title="Permalink to this definition"></a></dt>
+<dd><p>cross entropy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> (<em>2-D array</em>) – shape = (N_samples,N_class) onehotencoding</p></li>
+<li><p><strong>pred</strong> (<em>2-D array</em>) – shape = (N_samples,N_class) value shouled be in (0,1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mean of loss in records</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.util.kappa">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.util.</span></span><span class="sig-name descname"><span class="pre">kappa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.util.kappa" title="Permalink to this definition"></a></dt>
+<dd><p>this is used when approximating the inverse function of a probit function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sigma</strong> (<em>array</em>) – sigma</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1/sqrt(1 + pi*sigma/8)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.util.sigmoid">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.util.</span></span><span class="sig-name descname"><span class="pre">sigmoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.util.sigmoid" title="Permalink to this definition"></a></dt>
+<dd><p>sigmoid function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>logit</strong> (<em>array</em>) – data</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>same shape as logit</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="prml.utils.util.softmax">
+<span class="sig-prename descclassname"><span class="pre">prml.utils.util.</span></span><span class="sig-name descname"><span class="pre">softmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prml.utils.util.softmax" title="Permalink to this definition"></a></dt>
+<dd><p>softmax function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>2-D array</em>) – shape = (N_samples,N_class)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>shape = (N_samples,N_class)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>2-D array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-prml.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-prml.utils" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="prml.nn.html" class="btn btn-neutral float-left" title="prml.nn package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, hedwig100.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
