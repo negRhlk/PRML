@@ -51,7 +51,7 @@ You can clone this repository and make virtual environment.
 # clone repository and make venv 
 
 git clone https://github.com/hedwig100/PRML && cd PRML
-./setup.sh
+chmod 755 setup.sh && ./setup.sh
 python3 -m venv prml_venv 
 
 source prml_venv/bin/activate
@@ -73,6 +73,6 @@ docker build -t prml .
 docker run -it --name prml -p 8888:8888 prml /bin/bash
 
 # in docker container 
-PRML/setup.sh # or cd PRML && ./setup.sh
+cd PRML && ./setup.sh
 
 ```
