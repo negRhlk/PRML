@@ -3,7 +3,9 @@
 In this repository, various machine learning algorithms in 「Pattern Recognition and Machine Learning」without using machine learning packages such as `scikit-learn`. 
 
 All the algorithms are implemeted in the directory `prml`. In `short_notebook` directory, I use `prml` package (which I make myself). This notebooks are short-version, so 
-this is useful when you want to see how these algorithms work. However, many people must want to know how these algorithms are implemented. These notebooks in `notebook` directory 
+this is useful when you want to see how these algorithms work. <br>
+
+However, many people must want to know how these algorithms are implemented. These notebooks in `notebook` directory 
 meet this need. In `notebook`, nothing of `prml` is used. All algorithms are implemented in almost the same way as `prml`. You can write and modify the code in jupyter notebook. 
 
 **Notebooks**
@@ -41,10 +43,11 @@ meet this need. In `notebook`, nothing of `prml` is used. All algorithms are imp
 
 ## Setup 
 
-There are three suggested ways to set up the environment to run this python repository. 
-
-**Example1**
-You can clone this repository and make virtual environment. 
+There are three suggested ways to set up the environment to run this python repository. There are many other ways to set up, but Example2 may be 
+the best way (because it doesn't take so much time to build docker image)<br>
+  
+**Example1** <br>
+You can clone this repository and make virtual environment. <br>
 
 ```
 
@@ -59,15 +62,15 @@ pip install -r requirements.txt # in virtual environment
 pip install notebook
 
 ```
+<br>
 
-**Example2**
+**Example2** <br>
 You can clone this repository and build docker image. 
-You need to have docker installed.  
+You need to have docker installed. <br>
 
 ```
 
 # clone repository and build docker image
-
 git clone https://github.com/hedwig100/PRML && cd PRML
 docker build -t prml .
 docker run -it --name prml -p 8888:8888 prml /bin/bash
@@ -76,3 +79,21 @@ docker run -it --name prml -p 8888:8888 prml /bin/bash
 cd PRML && ./setup.sh
 
 ```
+in docker container, you can use `jupyter notebook` command. <br> 
+<br>
+
+**Example3** <br> 
+You can pull docker image from docker hub. [This image](https://hub.docker.com/r/hedwig100/prml) is uploaded to docker hub. <br>
+In this way, you cannot see document because no document is in the docker container. 
+
+```
+
+# pull docker image and run
+docker pull hedwig100/prml:latest
+docker run -it --name prml -p 8888:8888 hedwig100/prml:latest /bin/bash
+
+# in docker container 
+cd PRML && ./setup.sh
+
+```
+in docker container, you can use `jupyter notebook` command. <br> 
