@@ -10,6 +10,7 @@
 /data/iris.data
 
 /test
+/docs
 todo.txt
 .gitignore
 Dockerfile
